@@ -22,6 +22,7 @@ export const applyDrawResult = ({
 		currentCard: card,
 		previousCard: state.currentCard,
 		message,
+		deckConfig: state.deckConfig,
 		valueMatches: state.valueMatches + (message === "SNAP VALUE!" ? 1 : 0),
 		suitMatches: state.suitMatches + (message === "SNAP SUIT!" ? 1 : 0),
 		drawnCount: state.drawnCount + 1,

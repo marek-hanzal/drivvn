@@ -1,9 +1,9 @@
 import { withDrawCardsExistingDeckMutation } from "@drivvn/sdk/mutation/drawCardsExistingDeck";
 import { withGetShuffledDeckQuery } from "@drivvn/sdk/query/getShuffledDeck";
 import { startTransition, useCallback, useEffect, useState } from "react";
+import { snapDeckConfig } from "../config/deck/DeckConfig";
 import { applyDrawResult } from "../service/snap/applyDrawResult";
 import { createInitialSnapState } from "../service/snap/createInitialSnapState";
-import { getCardProgressLabel } from "../service/snap/getCardProgressLabel";
 import { getNextSnapProbability } from "../service/snap/getNextSnapProbability";
 import { isDeckComplete } from "../service/snap/isDeckComplete";
 
@@ -16,19 +16,21 @@ export type SnapGamePhase = useSnapGame.Phase;
 export const useSnapGame = () => {
 	const deckQuery = withGetShuffledDeckQuery.useSuspenseQuery({
 		query: {
-			deck_count: 1,
+			deck_count: snapDeckConfig.deckCount,
 		},
 	});
 	const invalidateDeck = withGetShuffledDeckQuery.useInvalidate({
 		query: {
-			deck_count: 1,
+			deck_count: snapDeckConfig.deckCount,
 		},
 	});
 	const drawCardsMutation = withDrawCardsExistingDeckMutation.useMutation();
 	const deck = deckQuery.data;
+	const totalCards = Number(deck.remaining);
 	const [state, setState] = useState(() =>
 		createInitialSnapState({
-			remaining: Number(deck.remaining),
+			remaining: totalCards,
+			deckConfig: snapDeckConfig,
 		}),
 	);
 	const [phase, setPhase] = useState<useSnapGame.Phase>("idle");
@@ -37,13 +39,15 @@ export const useSnapGame = () => {
 	useEffect(() => {
 		setState(
 			createInitialSnapState({
-				remaining: Number(deck.remaining),
+				remaining: totalCards,
+				deckConfig: snapDeckConfig,
 			}),
 		);
 		setPhase("idle");
 	}, [
 		deck.deck_id,
 		deck.remaining,
+		totalCards,
 	]);
 
 	const drawInternal = useCallback(async () => {
@@ -128,6 +132,7 @@ export const useSnapGame = () => {
 
 			const nextState = createInitialSnapState({
 				remaining: Number(nextDeckData.remaining),
+				deckConfig: snapDeckConfig,
 			});
 			const result = await drawCardsMutation.mutateAsync({
 				path: {
@@ -170,13 +175,12 @@ export const useSnapGame = () => {
 		currentCard: state.currentCard,
 		previousCard: state.previousCard,
 		message: state.message,
+		totalCards: state.deckConfig.totalCards,
+		drawnCount: state.drawnCount,
 		stats: {
 			valueMatches: state.valueMatches,
 			suitMatches: state.suitMatches,
 		},
-		progressLabel: getCardProgressLabel({
-			state,
-		}),
 		nextSnapProbability: getNextSnapProbability({
 			state,
 		}),

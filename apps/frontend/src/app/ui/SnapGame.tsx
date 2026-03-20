@@ -17,8 +17,9 @@ export const SnapGame: FC = () => {
 		currentCard,
 		previousCard,
 		message,
+		totalCards,
+		drawnCount,
 		stats,
-		progressLabel,
 		nextSnapProbability,
 		isComplete,
 		start,
@@ -71,7 +72,7 @@ export const SnapGame: FC = () => {
 					gap: "sm",
 				}}
 			>
-				<div>{progressLabel}</div>
+				<div>{`Card ${drawnCount} of ${totalCards}`}</div>
 				<div>{`Next snap chance: ${(nextSnapProbability * 100).toFixed(1)}%`}</div>
 				<div>{`Value matches: ${stats.valueMatches}`}</div>
 				<div>{`Suit matches: ${stats.suitMatches}`}</div>

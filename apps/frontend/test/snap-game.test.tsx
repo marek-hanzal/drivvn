@@ -12,11 +12,12 @@ let hookState: {
 	currentCard?: tCard;
 	previousCard?: tCard;
 	message?: string;
+	totalCards: number;
+	drawnCount: number;
 	stats: {
 		valueMatches: number;
 		suitMatches: number;
 	};
-	progressLabel: string;
 	nextSnapProbability: number;
 	isComplete: boolean;
 };
@@ -58,11 +59,12 @@ describe("SnapGame", () => {
 			currentCard: undefined,
 			previousCard: undefined,
 			message: undefined,
+			totalCards: 52,
+			drawnCount: 0,
 			stats: {
 				valueMatches: 0,
 				suitMatches: 0,
 			},
-			progressLabel: "Card 0 of 52",
 			nextSnapProbability: 0,
 			isComplete: false,
 		};
@@ -136,7 +138,8 @@ describe("SnapGame", () => {
 				valueMatches: 1,
 				suitMatches: 4,
 			},
-			progressLabel: "Card 12 of 52",
+			totalCards: 52,
+			drawnCount: 12,
 			nextSnapProbability: 0.325,
 			isComplete: false,
 		};
@@ -195,7 +198,8 @@ describe("SnapGame", () => {
 				valueMatches: 9,
 				suitMatches: 4,
 			},
-			progressLabel: "Card 52 of 52",
+			totalCards: 52,
+			drawnCount: 52,
 			nextSnapProbability: 0,
 			isComplete: true,
 		};

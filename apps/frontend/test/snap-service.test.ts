@@ -1,8 +1,8 @@
 import type { tCard } from "@drivvn/sdk/api/client";
 import { describe, expect, it } from "vitest";
+import { createStandardDeckConfig } from "../src/app/config/deck/DeckConfig";
 import { applyDrawResult } from "../src/app/service/snap/applyDrawResult";
 import { createInitialSnapState } from "../src/app/service/snap/createInitialSnapState";
-import { getCardProgressLabel } from "../src/app/service/snap/getCardProgressLabel";
 import { getNextSnapProbability } from "../src/app/service/snap/getNextSnapProbability";
 
 const createCard = ({
@@ -27,10 +27,15 @@ const createCard = ({
 };
 
 describe("snap service", () => {
-	it("tracks card progress labels", () => {
+	const deckConfig = createStandardDeckConfig({
+		deckCount: 1,
+	});
+
+	it("tracks total cards from the initial deck state", () => {
 		const state = applyDrawResult({
 			state: createInitialSnapState({
 				remaining: 52,
+				deckConfig,
 			}),
 			drawResult: {
 				card: createCard({
@@ -42,17 +47,15 @@ describe("snap service", () => {
 			},
 		});
 
-		expect(
-			getCardProgressLabel({
-				state,
-			}),
-		).toBe("Card 1 of 52");
+		expect(state.deckConfig.totalCards).toBe(52);
+		expect(state.drawnCount).toBe(1);
 	});
 
 	it("calculates the probability of the next value or suit match from drawn cards", () => {
 		const firstDraw = applyDrawResult({
 			state: createInitialSnapState({
 				remaining: 52,
+				deckConfig,
 			}),
 			drawResult: {
 				card: createCard({
@@ -92,6 +95,7 @@ describe("snap service", () => {
 	it("returns zero probability when there is no current card or no cards left", () => {
 		const initialState = createInitialSnapState({
 			remaining: 52,
+			deckConfig,
 		});
 
 		expect(
