@@ -39,9 +39,11 @@ export const sDrawnCards = {
             }
         },
         remaining: {
-            type: 'integer',
-            format: 'int32',
+            $ref: '#/components/schemas/Remaining',
             example: 30
+        },
+        piles: {
+            $ref: '#/components/schemas/Piles'
         }
     }
 } as const;
@@ -89,11 +91,8 @@ export const sCard = {
 } as const;
 
 export const sCardCodes = {
-    type: 'array',
-    items: {
-        type: 'string',
-        example: '2S'
-    }
+    type: 'string',
+    example: 'AS,2S'
 } as const;
 
 export const sPileResult = {
@@ -105,15 +104,14 @@ export const sPileResult = {
         deck_id: {
             type: 'string'
         },
+        shuffled: {
+            type: 'boolean'
+        },
         remaining: {
-            type: 'integer',
-            format: 'int32'
+            $ref: '#/components/schemas/Remaining'
         },
         piles: {
-            type: 'object',
-            items: {
-                $ref: '#/components/schemas/Pile'
-            }
+            $ref: '#/components/schemas/Piles'
         }
     }
 } as const;
@@ -122,8 +120,33 @@ export const sPile = {
     type: 'object',
     properties: {
         remaining: {
-            type: 'integer',
-            format: 'int32'
+            $ref: '#/components/schemas/Remaining'
+        },
+        cards: {
+            type: 'array',
+            items: {
+                $ref: '#/components/schemas/Card'
+            }
         }
     }
+} as const;
+
+export const sPiles = {
+    type: 'object',
+    additionalProperties: {
+        $ref: '#/components/schemas/Pile'
+    }
+} as const;
+
+export const sRemaining = {
+    oneOf: [
+        {
+            type: 'integer',
+            format: 'int32'
+        },
+        {
+            type: 'string'
+        }
+    ],
+    example: 52
 } as const;

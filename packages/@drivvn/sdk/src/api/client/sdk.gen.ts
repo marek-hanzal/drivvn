@@ -2,8 +2,8 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { tAddCardsToPileRequest, tAddCardsToPileResponse, tDrawCardsExistingDeckRequest, tDrawCardsExistingDeckResponse, tDrawCardsNewDeckRequest, tDrawCardsNewDeckResponse, tDrawFromDeckBottomRequest, tDrawFromDeckBottomResponse, tDrawFromDeckRandomRequest, tDrawFromDeckRandomResponse, tDrawFromPileRequest, tDrawFromPileResponse, tGetShuffledDeckRequest, tGetShuffledDeckResponse, tGetUnshuffledDeckRequest, tGetUnshuffledDeckResponse, tListPileRequest, tListPileResponse, tReshuffleDeckRequest, tReshuffleDeckResponse, tReturnCardsToDeckRequest, tReturnCardsToDeckResponse, tReturnCardsToPileRequest, tReturnCardsToPileResponse, tShufflePileRequest, tShufflePileResponse } from './types.gen';
-import { zAddCardsToPileData, zAddCardsToPileResponse, zDrawCardsExistingDeckData, zDrawCardsExistingDeckResponse, zDrawCardsNewDeckData, zDrawCardsNewDeckResponse, zDrawFromDeckBottomData, zDrawFromDeckBottomResponse, zDrawFromDeckRandomData, zDrawFromDeckRandomResponse, zDrawFromPileData, zDrawFromPileResponse, zGetShuffledDeckData, zGetShuffledDeckResponse, zGetUnshuffledDeckData, zGetUnshuffledDeckResponse, zListPileData, zListPileResponse, zReshuffleDeckData, zReshuffleDeckResponse, zReturnCardsToDeckData, zReturnCardsToDeckResponse, zReturnCardsToPileData, zReturnCardsToPileResponse, zShufflePileData, zShufflePileResponse } from './zod.gen';
+import type { tAddCardsToPileRequest, tAddCardsToPileResponse, tDrawCardsExistingDeckRequest, tDrawCardsExistingDeckResponse, tDrawCardsNewDeckRequest, tDrawCardsNewDeckResponse, tDrawFromPileBottomRequest, tDrawFromPileBottomResponse, tDrawFromPileRandomRequest, tDrawFromPileRandomResponse, tDrawFromPileRequest, tDrawFromPileResponse, tGetShuffledDeckRequest, tGetShuffledDeckResponse, tGetUnshuffledDeckRequest, tGetUnshuffledDeckResponse, tListPileRequest, tListPileResponse, tReshuffleDeckRequest, tReshuffleDeckResponse, tReturnCardsToDeckRequest, tReturnCardsToDeckResponse, tReturnCardsToPileRequest, tReturnCardsToPileResponse, tShufflePileRequest, tShufflePileResponse } from './types.gen';
+import { zAddCardsToPileData, zAddCardsToPileResponse, zDrawCardsExistingDeckData, zDrawCardsExistingDeckResponse, zDrawCardsNewDeckData, zDrawCardsNewDeckResponse, zDrawFromPileBottomData, zDrawFromPileBottomResponse, zDrawFromPileData, zDrawFromPileRandomData, zDrawFromPileRandomResponse, zDrawFromPileResponse, zGetShuffledDeckData, zGetShuffledDeckResponse, zGetUnshuffledDeckData, zGetUnshuffledDeckResponse, zListPileData, zListPileResponse, zReshuffleDeckData, zReshuffleDeckResponse, zReturnCardsToDeckData, zReturnCardsToDeckResponse, zReturnCardsToPileData, zReturnCardsToPileResponse, zShufflePileData, zShufflePileResponse } from './zod.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -64,28 +64,6 @@ export const drawCardsNewDeck = <ThrowOnError extends boolean = false>(options?:
 });
 
 /**
- * Draw from bottom of deck
- */
-export const drawFromDeckBottom = <ThrowOnError extends boolean = false>(options: Options<tDrawFromDeckBottomRequest, ThrowOnError>) => (options.client ?? client).get<tDrawFromDeckBottomResponse, unknown, ThrowOnError>({
-    requestValidator: async (data) => await zDrawFromDeckBottomData.parseAsync(data),
-    responseType: 'json',
-    responseValidator: async (data) => await zDrawFromDeckBottomResponse.parseAsync(data),
-    url: '/deck/{deck_id}/draw/bottom/',
-    ...options
-});
-
-/**
- * Draw randomly from deck
- */
-export const drawFromDeckRandom = <ThrowOnError extends boolean = false>(options: Options<tDrawFromDeckRandomRequest, ThrowOnError>) => (options.client ?? client).get<tDrawFromDeckRandomResponse, unknown, ThrowOnError>({
-    requestValidator: async (data) => await zDrawFromDeckRandomData.parseAsync(data),
-    responseType: 'json',
-    responseValidator: async (data) => await zDrawFromDeckRandomResponse.parseAsync(data),
-    url: '/deck/{deck_id}/draw/random/',
-    ...options
-});
-
-/**
  * Reshuffle an existing deck
  */
 export const reshuffleDeck = <ThrowOnError extends boolean = false>(options: Options<tReshuffleDeckRequest, ThrowOnError>) => (options.client ?? client).get<tReshuffleDeckResponse, unknown, ThrowOnError>({
@@ -114,7 +92,7 @@ export const addCardsToPile = <ThrowOnError extends boolean = false>(options: Op
     requestValidator: async (data) => await zAddCardsToPileData.parseAsync(data),
     responseType: 'json',
     responseValidator: async (data) => await zAddCardsToPileResponse.parseAsync(data),
-    url: '/deck/{deck_id}/pile/{pile_id}/add/',
+    url: '/deck/{deck_id}/pile/{pile_name}/add/',
     ...options
 });
 
@@ -125,7 +103,7 @@ export const shufflePile = <ThrowOnError extends boolean = false>(options: Optio
     requestValidator: async (data) => await zShufflePileData.parseAsync(data),
     responseType: 'json',
     responseValidator: async (data) => await zShufflePileResponse.parseAsync(data),
-    url: '/deck/{deck_id}/pile/{pile_id}/shuffle/',
+    url: '/deck/{deck_id}/pile/{pile_name}/shuffle/',
     ...options
 });
 
@@ -136,7 +114,7 @@ export const listPile = <ThrowOnError extends boolean = false>(options: Options<
     requestValidator: async (data) => await zListPileData.parseAsync(data),
     responseType: 'json',
     responseValidator: async (data) => await zListPileResponse.parseAsync(data),
-    url: '/deck/{deck_id}/pile/{pile_id}/list/',
+    url: '/deck/{deck_id}/pile/{pile_name}/list/',
     ...options
 });
 
@@ -147,7 +125,29 @@ export const drawFromPile = <ThrowOnError extends boolean = false>(options: Opti
     requestValidator: async (data) => await zDrawFromPileData.parseAsync(data),
     responseType: 'json',
     responseValidator: async (data) => await zDrawFromPileResponse.parseAsync(data),
-    url: '/deck/{deck_id}/pile/{pile_id}/draw/',
+    url: '/deck/{deck_id}/pile/{pile_name}/draw/',
+    ...options
+});
+
+/**
+ * Draw from the bottom of a pile
+ */
+export const drawFromPileBottom = <ThrowOnError extends boolean = false>(options: Options<tDrawFromPileBottomRequest, ThrowOnError>) => (options.client ?? client).get<tDrawFromPileBottomResponse, unknown, ThrowOnError>({
+    requestValidator: async (data) => await zDrawFromPileBottomData.parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) => await zDrawFromPileBottomResponse.parseAsync(data),
+    url: '/deck/{deck_id}/pile/{pile_name}/draw/bottom/',
+    ...options
+});
+
+/**
+ * Draw random cards from a pile
+ */
+export const drawFromPileRandom = <ThrowOnError extends boolean = false>(options: Options<tDrawFromPileRandomRequest, ThrowOnError>) => (options.client ?? client).get<tDrawFromPileRandomResponse, unknown, ThrowOnError>({
+    requestValidator: async (data) => await zDrawFromPileRandomData.parseAsync(data),
+    responseType: 'json',
+    responseValidator: async (data) => await zDrawFromPileRandomResponse.parseAsync(data),
+    url: '/deck/{deck_id}/pile/{pile_name}/draw/random/',
     ...options
 });
 
@@ -158,6 +158,6 @@ export const returnCardsToPile = <ThrowOnError extends boolean = false>(options:
     requestValidator: async (data) => await zReturnCardsToPileData.parseAsync(data),
     responseType: 'json',
     responseValidator: async (data) => await zReturnCardsToPileResponse.parseAsync(data),
-    url: '/deck/{deck_id}/pile/{pile_id}/return/',
+    url: '/deck/{deck_id}/pile/{pile_name}/return/',
     ...options
 });

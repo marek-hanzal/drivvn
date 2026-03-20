@@ -29,39 +29,58 @@ export const zCard = z.object({
 
 export type zCard = z.infer<typeof zCard>;
 
+/**
+ * Comma-separated list of card codes, for example AS,2S
+ */
+export const zCardCodes = z.string().register(z.globalRegistry, {
+    description: 'Comma-separated list of card codes, for example AS,2S'
+});
+
+export type zCardCodes = z.infer<typeof zCardCodes>;
+
+export const zRemaining = z.union([
+    z.int().min(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }),
+    z.string()
+]);
+
+export type zRemaining = z.infer<typeof zRemaining>;
+
+export const zPile = z.object({
+    remaining: zRemaining.optional(),
+    cards: z.array(zCard).optional()
+});
+
+export type zPile = z.infer<typeof zPile>;
+
+export const zPiles = z.record(z.string(), zPile);
+
+export type zPiles = z.infer<typeof zPiles>;
+
 export const zDrawnCards = z.object({
     success: z.boolean().optional(),
     deck_id: z.string().optional(),
     cards: z.array(zCard).optional(),
-    remaining: z.int().min(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).optional()
+    remaining: zRemaining.optional(),
+    piles: zPiles.optional()
 });
 
 export type zDrawnCards = z.infer<typeof zDrawnCards>;
 
-export const zCardCodes = z.array(z.string());
-
-export type zCardCodes = z.infer<typeof zCardCodes>;
-
 export const zPileResult = z.object({
     success: z.boolean().optional(),
     deck_id: z.string().optional(),
-    remaining: z.int().min(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).optional(),
-    piles: z.record(z.string(), z.unknown()).optional()
+    shuffled: z.boolean().optional(),
+    remaining: zRemaining.optional(),
+    piles: zPiles.optional()
 });
 
 export type zPileResult = z.infer<typeof zPileResult>;
-
-export const zPile = z.object({
-    remaining: z.int().min(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).optional()
-});
-
-export type zPile = z.infer<typeof zPile>;
 
 export const zGetUnshuffledDeckData = z.object({
     body: z.never().optional(),
     path: z.never().optional(),
     query: z.object({
-        deck_count: z.string().register(z.globalRegistry, {
+        deck_count: z.int().min(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).register(z.globalRegistry, {
             description: 'Number of decks to retrieve'
         }).optional(),
         jokers_enabled: z.boolean().optional()
@@ -84,7 +103,7 @@ export const zGetShuffledDeckData = z.object({
         deck_count: z.int().min(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).register(z.globalRegistry, {
             description: 'Number of decks to retrieve'
         }).optional(),
-        cards: z.array(zCardCodes).optional()
+        cards: zCardCodes.optional()
     }).optional()
 });
 
@@ -139,40 +158,6 @@ export const zDrawCardsNewDeckResponse = zDrawnCards;
 
 export type zdrawCardsNewDeckResponse = z.infer<typeof zDrawCardsNewDeckResponse>;
 
-export const zDrawFromDeckBottomData = z.object({
-    body: z.never().optional(),
-    path: z.object({
-        deck_id: z.string()
-    }),
-    query: z.never().optional()
-});
-
-export type zdrawFromDeckBottomRequest = z.infer<typeof zDrawFromDeckBottomData>;
-
-/**
- * Drawn cards
- */
-export const zDrawFromDeckBottomResponse = zDrawnCards;
-
-export type zdrawFromDeckBottomResponse = z.infer<typeof zDrawFromDeckBottomResponse>;
-
-export const zDrawFromDeckRandomData = z.object({
-    body: z.never().optional(),
-    path: z.object({
-        deck_id: z.string()
-    }),
-    query: z.never().optional()
-});
-
-export type zdrawFromDeckRandomRequest = z.infer<typeof zDrawFromDeckRandomData>;
-
-/**
- * Drawn cards
- */
-export const zDrawFromDeckRandomResponse = zDrawnCards;
-
-export type zdrawFromDeckRandomResponse = z.infer<typeof zDrawFromDeckRandomResponse>;
-
 export const zReshuffleDeckData = z.object({
     body: z.never().optional(),
     path: z.object({
@@ -198,8 +183,8 @@ export const zReturnCardsToDeckData = z.object({
         deck_id: z.string()
     }),
     query: z.object({
-        cards: zCardCodes
-    })
+        cards: zCardCodes.optional()
+    }).optional()
 });
 
 export type zreturnCardsToDeckRequest = z.infer<typeof zReturnCardsToDeckData>;
@@ -215,7 +200,7 @@ export const zAddCardsToPileData = z.object({
     body: z.never().optional(),
     path: z.object({
         deck_id: z.string(),
-        pile_id: z.string()
+        pile_name: z.string()
     }),
     query: z.object({
         cards: zCardCodes
@@ -235,7 +220,7 @@ export const zShufflePileData = z.object({
     body: z.never().optional(),
     path: z.object({
         deck_id: z.string(),
-        pile_id: z.string()
+        pile_name: z.string()
     }),
     query: z.never().optional()
 });
@@ -253,7 +238,7 @@ export const zListPileData = z.object({
     body: z.never().optional(),
     path: z.object({
         deck_id: z.string(),
-        pile_id: z.string()
+        pile_name: z.string()
     }),
     query: z.never().optional()
 });
@@ -271,11 +256,11 @@ export const zDrawFromPileData = z.object({
     body: z.never().optional(),
     path: z.object({
         deck_id: z.string(),
-        pile_id: z.string()
+        pile_name: z.string()
     }),
     query: z.object({
         count: z.int().min(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).optional(),
-        cards: z.array(zCardCodes).optional()
+        cards: zCardCodes.optional()
     }).optional()
 });
 
@@ -288,15 +273,55 @@ export const zDrawFromPileResponse = zDrawnCards;
 
 export type zdrawFromPileResponse = z.infer<typeof zDrawFromPileResponse>;
 
+export const zDrawFromPileBottomData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        deck_id: z.string(),
+        pile_name: z.string()
+    }),
+    query: z.object({
+        count: z.int().min(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).optional()
+    }).optional()
+});
+
+export type zdrawFromPileBottomRequest = z.infer<typeof zDrawFromPileBottomData>;
+
+/**
+ * Drawn cards from the bottom of a pile
+ */
+export const zDrawFromPileBottomResponse = zDrawnCards;
+
+export type zdrawFromPileBottomResponse = z.infer<typeof zDrawFromPileBottomResponse>;
+
+export const zDrawFromPileRandomData = z.object({
+    body: z.never().optional(),
+    path: z.object({
+        deck_id: z.string(),
+        pile_name: z.string()
+    }),
+    query: z.object({
+        count: z.int().min(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).optional()
+    }).optional()
+});
+
+export type zdrawFromPileRandomRequest = z.infer<typeof zDrawFromPileRandomData>;
+
+/**
+ * Randomly drawn cards from a pile
+ */
+export const zDrawFromPileRandomResponse = zDrawnCards;
+
+export type zdrawFromPileRandomResponse = z.infer<typeof zDrawFromPileRandomResponse>;
+
 export const zReturnCardsToPileData = z.object({
     body: z.never().optional(),
     path: z.object({
         deck_id: z.string(),
-        pile_id: z.string()
+        pile_name: z.string()
     }),
     query: z.object({
-        cards: zCardCodes
-    })
+        cards: zCardCodes.optional()
+    }).optional()
 });
 
 export type zreturnCardsToPileRequest = z.infer<typeof zReturnCardsToPileData>;

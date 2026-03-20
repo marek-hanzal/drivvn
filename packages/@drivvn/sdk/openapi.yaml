@@ -25,7 +25,8 @@ paths:
           description: Number of decks to retrieve
           required: false
           schema:
-            type: string
+            type: integer
+            format: int32
         - name: jokers_enabled
           in: query
           required: false
@@ -58,9 +59,7 @@ paths:
           in: query
           required: false
           schema:
-            type: array
-            items:
-              $ref: "#/components/schemas/CardCodes"
+            $ref: "#/components/schemas/CardCodes"
       responses:
         "200":
           description: One or more combined card decks, or a partial deck if cards is specified in query string.
@@ -119,46 +118,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DrawnCards"
-  /deck/{deck_id}/draw/bottom/:
-    get:
-      summary: Draw from bottom of deck
-      operationId: drawFromDeckBottom
-      tags:
-        - deck
-      parameters:
-        - name: deck_id
-          in: path
-          required: true
-          schema:
-            type: string
-            example: hyi02vw0n72p
-      responses:
-        "200":
-          description: Drawn cards
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DrawnCards"
-  /deck/{deck_id}/draw/random/:
-    get:
-      summary: Draw randomly from deck
-      operationId: drawFromDeckRandom
-      tags:
-        - deck
-      parameters:
-        - name: deck_id
-          in: path
-          required: true
-          schema:
-            type: string
-            example: hyi02vw0n72p
-      responses:
-        "200":
-          description: Drawn cards
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DrawnCards"
   /deck/{deck_id}/shuffle/:
     get:
       summary: Reshuffle an existing deck
@@ -193,7 +152,7 @@ paths:
       parameters:
         - name: cards
           in: query
-          required: true
+          required: false
           schema:
             $ref: "#/components/schemas/CardCodes"
         - name: deck_id
@@ -209,7 +168,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PileResult"
-  /deck/{deck_id}/pile/{pile_id}/add/:
+  /deck/{deck_id}/pile/{pile_name}/add/:
     get:
       summary: Add cards to a new or existing pile. If pile doesn't exist, it will be created.
       operationId: addCardsToPile
@@ -227,7 +186,7 @@ paths:
           schema:
             type: string
             example: hyi02vw0n72p
-        - name: pile_id
+        - name: pile_name
           in: path
           required: true
           schema:
@@ -239,7 +198,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PileResult"
-  /deck/{deck_id}/pile/{pile_id}/shuffle/:
+  /deck/{deck_id}/pile/{pile_name}/shuffle/:
     get:
       summary: Shuffle a specified pile.
       operationId: shufflePile
@@ -252,7 +211,7 @@ paths:
           schema:
             type: string
             example: hyi02vw0n72p
-        - name: pile_id
+        - name: pile_name
           in: path
           required: true
           schema:
@@ -264,7 +223,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PileResult"
-  /deck/{deck_id}/pile/{pile_id}/list/:
+  /deck/{deck_id}/pile/{pile_name}/list/:
     get:
       summary: List contents of a pile
       operationId: listPile
@@ -277,7 +236,7 @@ paths:
           schema:
             type: string
             example: hyi02vw0n72p
-        - name: pile_id
+        - name: pile_name
           in: path
           required: true
           schema:
@@ -289,7 +248,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PileResult"
-  /deck/{deck_id}/pile/{pile_id}/draw/:
+  /deck/{deck_id}/pile/{pile_name}/draw/:
     get:
       summary: Draw from pile
       operationId: drawFromPile
@@ -306,16 +265,14 @@ paths:
           in: query
           required: false
           schema:
-            type: array
-            items:
-              $ref: "#/components/schemas/CardCodes"
+            $ref: "#/components/schemas/CardCodes"
         - name: deck_id
           in: path
           required: true
           schema:
             type: string
             example: hyi02vw0n72p
-        - name: pile_id
+        - name: pile_name
           in: path
           required: true
           schema:
@@ -327,7 +284,69 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DrawnCards"
-  /deck/{deck_id}/pile/{pile_id}/return/:
+  /deck/{deck_id}/pile/{pile_name}/draw/bottom/:
+    get:
+      summary: Draw from the bottom of a pile
+      operationId: drawFromPileBottom
+      tags:
+        - pile
+      parameters:
+        - name: count
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: deck_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: hyi02vw0n72p
+        - name: pile_name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Drawn cards from the bottom of a pile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DrawnCards"
+  /deck/{deck_id}/pile/{pile_name}/draw/random/:
+    get:
+      summary: Draw random cards from a pile
+      operationId: drawFromPileRandom
+      tags:
+        - pile
+      parameters:
+        - name: count
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: deck_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: hyi02vw0n72p
+        - name: pile_name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Randomly drawn cards from a pile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DrawnCards"
+  /deck/{deck_id}/pile/{pile_name}/return/:
     get:
       summary: Return cards to deck
       operationId: returnCardsToPile
@@ -336,7 +355,7 @@ paths:
       parameters:
         - name: cards
           in: query
-          required: true
+          required: false
           schema:
             $ref: "#/components/schemas/CardCodes"
         - name: deck_id
@@ -345,7 +364,7 @@ paths:
           schema:
             type: string
             example: hyi02vw0n72p
-        - name: pile_id
+        - name: pile_name
           in: path
           required: true
           schema:
@@ -387,9 +406,10 @@ components:
           items:
             $ref: "#/components/schemas/Card"
         remaining:
-          type: integer
-          format: int32
+          $ref: "#/components/schemas/Remaining"
           example: 30
+        piles:
+          $ref: "#/components/schemas/Piles"
     Card:
       type: object
       properties:
@@ -421,10 +441,9 @@ components:
             - HEARTS
             - DIAMONDS
     CardCodes:
-      type: array
-      items:
-        type: string
-        example: 2S
+      type: string
+      description: Comma-separated list of card codes, for example AS,2S
+      example: AS,2S
     PileResult:
       type: object
       properties:
@@ -432,16 +451,28 @@ components:
           type: boolean
         deck_id:
           type: string
+        shuffled:
+          type: boolean
         remaining:
-          type: integer
-          format: int32
+          $ref: "#/components/schemas/Remaining"
         piles:
-          type: object
-          items:
-            $ref: "#/components/schemas/Pile"
+          $ref: "#/components/schemas/Piles"
     Pile:
       type: object
       properties:
         remaining:
-          type: integer
+          $ref: "#/components/schemas/Remaining"
+        cards:
+          type: array
+          items:
+            $ref: "#/components/schemas/Card"
+    Piles:
+      type: object
+      additionalProperties:
+        $ref: "#/components/schemas/Pile"
+    Remaining:
+      oneOf:
+        - type: integer
           format: int32
+        - type: string
+      example: 52

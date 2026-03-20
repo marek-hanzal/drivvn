@@ -15,7 +15,8 @@ export type tDrawnCards = {
     success?: boolean;
     deck_id?: string;
     cards?: Array<tCard>;
-    remaining?: number;
+    remaining?: tRemaining;
+    piles?: tPiles;
 };
 
 export type tCard = {
@@ -29,20 +30,29 @@ export type tCard = {
     suit?: 'SPADES' | 'CLUBS' | 'HEARTS' | 'DIAMONDS';
 };
 
-export type tCardCodes = Array<string>;
+/**
+ * Comma-separated list of card codes, for example AS,2S
+ */
+export type tCardCodes = string;
 
 export type tPileResult = {
     success?: boolean;
     deck_id?: string;
-    remaining?: number;
-    piles?: {
-        [key: string]: unknown;
-    };
+    shuffled?: boolean;
+    remaining?: tRemaining;
+    piles?: tPiles;
 };
 
 export type tPile = {
-    remaining?: number;
+    remaining?: tRemaining;
+    cards?: Array<tCard>;
 };
+
+export type tPiles = {
+    [key: string]: tPile;
+};
+
+export type tRemaining = number | string;
 
 export type tGetUnshuffledDeckRequest = {
     body?: never;
@@ -51,7 +61,7 @@ export type tGetUnshuffledDeckRequest = {
         /**
          * Number of decks to retrieve
          */
-        deck_count?: string;
+        deck_count?: number;
         jokers_enabled?: boolean;
     };
     url: '/deck/new/';
@@ -74,7 +84,7 @@ export type tGetShuffledDeckRequest = {
          * Number of decks to retrieve
          */
         deck_count?: number;
-        cards?: Array<tCardCodes>;
+        cards?: tCardCodes;
     };
     url: '/deck/new/shuffle/';
 };
@@ -135,42 +145,6 @@ export type tDrawCardsNewDeckResponse = {
 
 export type drawCardsNewDeckResponse = tDrawCardsNewDeckResponse[keyof tDrawCardsNewDeckResponse];
 
-export type tDrawFromDeckBottomRequest = {
-    body?: never;
-    path: {
-        deck_id: string;
-    };
-    query?: never;
-    url: '/deck/{deck_id}/draw/bottom/';
-};
-
-export type tDrawFromDeckBottomResponse = {
-    /**
-     * Drawn cards
-     */
-    200: tDrawnCards;
-};
-
-export type drawFromDeckBottomResponse = tDrawFromDeckBottomResponse[keyof tDrawFromDeckBottomResponse];
-
-export type tDrawFromDeckRandomRequest = {
-    body?: never;
-    path: {
-        deck_id: string;
-    };
-    query?: never;
-    url: '/deck/{deck_id}/draw/random/';
-};
-
-export type tDrawFromDeckRandomResponse = {
-    /**
-     * Drawn cards
-     */
-    200: tDrawnCards;
-};
-
-export type drawFromDeckRandomResponse = tDrawFromDeckRandomResponse[keyof tDrawFromDeckRandomResponse];
-
 export type tReshuffleDeckRequest = {
     body?: never;
     path: {
@@ -196,8 +170,8 @@ export type tReturnCardsToDeckRequest = {
     path: {
         deck_id: string;
     };
-    query: {
-        cards: tCardCodes;
+    query?: {
+        cards?: tCardCodes;
     };
     url: '/deck/{deck_id}/return/';
 };
@@ -215,12 +189,12 @@ export type tAddCardsToPileRequest = {
     body?: never;
     path: {
         deck_id: string;
-        pile_id: string;
+        pile_name: string;
     };
     query: {
         cards: tCardCodes;
     };
-    url: '/deck/{deck_id}/pile/{pile_id}/add/';
+    url: '/deck/{deck_id}/pile/{pile_name}/add/';
 };
 
 export type tAddCardsToPileResponse = {
@@ -236,10 +210,10 @@ export type tShufflePileRequest = {
     body?: never;
     path: {
         deck_id: string;
-        pile_id: string;
+        pile_name: string;
     };
     query?: never;
-    url: '/deck/{deck_id}/pile/{pile_id}/shuffle/';
+    url: '/deck/{deck_id}/pile/{pile_name}/shuffle/';
 };
 
 export type tShufflePileResponse = {
@@ -255,10 +229,10 @@ export type tListPileRequest = {
     body?: never;
     path: {
         deck_id: string;
-        pile_id: string;
+        pile_name: string;
     };
     query?: never;
-    url: '/deck/{deck_id}/pile/{pile_id}/list/';
+    url: '/deck/{deck_id}/pile/{pile_name}/list/';
 };
 
 export type tListPileResponse = {
@@ -274,13 +248,13 @@ export type tDrawFromPileRequest = {
     body?: never;
     path: {
         deck_id: string;
-        pile_id: string;
+        pile_name: string;
     };
     query?: {
         count?: number;
-        cards?: Array<tCardCodes>;
+        cards?: tCardCodes;
     };
-    url: '/deck/{deck_id}/pile/{pile_id}/draw/';
+    url: '/deck/{deck_id}/pile/{pile_name}/draw/';
 };
 
 export type tDrawFromPileResponse = {
@@ -292,16 +266,58 @@ export type tDrawFromPileResponse = {
 
 export type drawFromPileResponse = tDrawFromPileResponse[keyof tDrawFromPileResponse];
 
+export type tDrawFromPileBottomRequest = {
+    body?: never;
+    path: {
+        deck_id: string;
+        pile_name: string;
+    };
+    query?: {
+        count?: number;
+    };
+    url: '/deck/{deck_id}/pile/{pile_name}/draw/bottom/';
+};
+
+export type tDrawFromPileBottomResponse = {
+    /**
+     * Drawn cards from the bottom of a pile
+     */
+    200: tDrawnCards;
+};
+
+export type drawFromPileBottomResponse = tDrawFromPileBottomResponse[keyof tDrawFromPileBottomResponse];
+
+export type tDrawFromPileRandomRequest = {
+    body?: never;
+    path: {
+        deck_id: string;
+        pile_name: string;
+    };
+    query?: {
+        count?: number;
+    };
+    url: '/deck/{deck_id}/pile/{pile_name}/draw/random/';
+};
+
+export type tDrawFromPileRandomResponse = {
+    /**
+     * Randomly drawn cards from a pile
+     */
+    200: tDrawnCards;
+};
+
+export type drawFromPileRandomResponse = tDrawFromPileRandomResponse[keyof tDrawFromPileRandomResponse];
+
 export type tReturnCardsToPileRequest = {
     body?: never;
     path: {
         deck_id: string;
-        pile_id: string;
+        pile_name: string;
     };
-    query: {
-        cards: tCardCodes;
+    query?: {
+        cards?: tCardCodes;
     };
-    url: '/deck/{deck_id}/pile/{pile_id}/return/';
+    url: '/deck/{deck_id}/pile/{pile_name}/return/';
 };
 
 export type tReturnCardsToPileResponse = {
