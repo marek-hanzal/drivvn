@@ -82,8 +82,6 @@ export const useSnapGame = () => {
 				}),
 			);
 		});
-
-		return Number(result.remaining) === 0;
 	}, [
 		deck.deck_id,
 		drawCardsMutation,
@@ -96,8 +94,8 @@ export const useSnapGame = () => {
 		setPhase("starting");
 
 		try {
-			const isComplete = await drawInternal();
-			setPhase(isComplete ? "completed" : "ready");
+			await drawInternal();
+			setPhase("ready");
 		} catch (error) {
 			setPhase("idle");
 			throw error;
@@ -113,8 +111,8 @@ export const useSnapGame = () => {
 		setPhase("drawing");
 
 		try {
-			const isComplete = await drawInternal();
-			setPhase(isComplete ? "completed" : "ready");
+			await drawInternal();
+			setPhase("ready");
 		} catch (error) {
 			setPhase("ready");
 			throw error;
@@ -122,6 +120,13 @@ export const useSnapGame = () => {
 	}, [
 		drawInternal,
 	]);
+
+	/**
+	 * Finish the run and show the game-over summary once no more cards can be drawn.
+	 */
+	const finish = useCallback(() => {
+		setPhase("completed");
+	}, []);
 
 	/**
 	 * Reset the game by invalidating the shuffled deck query and immediately starting a fresh run.
@@ -213,11 +218,13 @@ export const useSnapGame = () => {
 			valueMatches: state.valueMatches,
 			suitMatches: state.suitMatches,
 		},
+		canFinish: state.remaining === 0,
 		nextSnapProbability: getNextSnapProbability({
 			state,
 		}),
 		start,
 		draw,
+		finish,
 		reset,
 		startFresh,
 	} as const;

@@ -6,6 +6,7 @@ import { SnapGame } from "../src/app/ui/SnapGame";
 
 let start = vi.fn(async () => {});
 let draw = vi.fn(async () => {});
+let finish = vi.fn(() => {});
 let reset = vi.fn(async () => {});
 let startFresh = vi.fn(async () => {});
 let hookState: {
@@ -19,6 +20,7 @@ let hookState: {
 		valueMatches: number;
 		suitMatches: number;
 	};
+	canFinish: boolean;
 	nextSnapProbability: number;
 };
 
@@ -27,6 +29,7 @@ vi.mock("../src/app/hook/useSnapGame", () => ({
 		...hookState,
 		start,
 		draw,
+		finish,
 		reset,
 		startFresh,
 	}),
@@ -66,10 +69,12 @@ describe("SnapGame", () => {
 				valueMatches: 0,
 				suitMatches: 0,
 			},
+			canFinish: false,
 			nextSnapProbability: 0,
 		};
 		start = vi.fn(async () => {});
 		draw = vi.fn(async () => {});
+		finish = vi.fn(() => {});
 		reset = vi.fn(async () => {});
 		startFresh = vi.fn(async () => {});
 	});
@@ -141,6 +146,7 @@ describe("SnapGame", () => {
 			},
 			totalCards: 52,
 			drawnCount: 12,
+			canFinish: false,
 			nextSnapProbability: 0.325,
 		};
 
@@ -180,6 +186,51 @@ describe("SnapGame", () => {
 		});
 	});
 
+	it("shows finish on the last visible card and calls finish through the control hook", async () => {
+		hookState = {
+			phase: "ready",
+			currentCard: createCard({
+				code: "AS",
+				value: "ACE",
+				suit: "SPADES",
+			}),
+			previousCard: createCard({
+				code: "AH",
+				value: "ACE",
+				suit: "HEARTS",
+			}),
+			message: "SNAP VALUE!",
+			stats: {
+				valueMatches: 9,
+				suitMatches: 4,
+			},
+			totalCards: 52,
+			drawnCount: 52,
+			canFinish: true,
+			nextSnapProbability: 0,
+		};
+
+		render(<SnapGame />);
+
+		expect(screen.getByText("Card 52 of 52")).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", {
+				name: "Finish",
+			}),
+		).toBeInTheDocument();
+		expect(screen.queryByText("Game over")).not.toBeInTheDocument();
+
+		fireEvent.click(
+			screen.getByRole("button", {
+				name: "Finish",
+			}),
+		);
+
+		await waitFor(() => {
+			expect(finish).toHaveBeenCalledTimes(1);
+		});
+	});
+
 	it("shows game over status without cards and calls reset", async () => {
 		hookState = {
 			phase: "completed",
@@ -200,6 +251,7 @@ describe("SnapGame", () => {
 			},
 			totalCards: 52,
 			drawnCount: 52,
+			canFinish: false,
 			nextSnapProbability: 0,
 		};
 

@@ -20,9 +20,11 @@ export const SnapGame: FC = () => {
 		totalCards,
 		drawnCount,
 		stats,
+		canFinish,
 		nextSnapProbability,
 		start,
 		draw,
+		finish,
 		reset,
 		startFresh,
 	} = useSnapGame();
@@ -169,7 +171,7 @@ export const SnapGame: FC = () => {
 
 			<Button
 				disabled={phase === "drawing"}
-				onClick={draw}
+				onClick={canFinish ? finish : draw}
 				ui={{
 					tone: "primary",
 					theme: "light",
@@ -177,7 +179,7 @@ export const SnapGame: FC = () => {
 					text: "xl",
 				}}
 			>
-				Draw card
+				{canFinish ? "Finish" : "Draw card"}
 			</Button>
 		</Container>
 	);
