@@ -372,18 +372,15 @@ describe("SnapGame", () => {
 
 		render(<SnapGame />);
 
-		expect(
-			screen.getByRole("button", {
-				name: "Solitaire celebration",
-			}),
-		).toBeInTheDocument();
+		const celebration = screen.getByRole("button", {
+			name: "Solitaire celebration",
+		});
+
+		expect(celebration).toBeInTheDocument();
+		expect(celebration).toHaveAttribute("data-card-count", "90");
 		expect(screen.getByText("Click anywhere to skip")).toBeInTheDocument();
 
-		fireEvent.click(
-			screen.getByRole("button", {
-				name: "Solitaire celebration",
-			}),
-		);
+		fireEvent.click(celebration);
 
 		await waitFor(() => {
 			expect(skipCelebration).toHaveBeenCalledTimes(1);

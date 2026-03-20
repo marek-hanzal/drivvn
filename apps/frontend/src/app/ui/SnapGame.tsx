@@ -295,6 +295,7 @@ export const SnapGame: FC = () => {
 			</AnimatePresence>
 
 			<Button
+				className={"select-none"}
 				disabled={phase === "drawing" || phase === "celebrating"}
 				onClick={canFinish ? finish : draw}
 				ui={{
@@ -307,7 +308,13 @@ export const SnapGame: FC = () => {
 				{canFinish ? "Finish" : "Draw card"}
 			</Button>
 
-			{phase === "celebrating" ? <WinCelebration onSkip={skipCelebration} /> : null}
+			{phase === "celebrating" ? (
+				<WinCelebration
+					onSkip={skipCelebration}
+					suitMatches={stats.suitMatches}
+					valueMatches={stats.valueMatches}
+				/>
+			) : null}
 		</Container>
 	);
 };

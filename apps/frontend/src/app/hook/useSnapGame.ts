@@ -6,7 +6,7 @@ import { applyDrawResult } from "../service/snap/applyDrawResult";
 import { createInitialSnapState } from "../service/snap/createInitialSnapState";
 import { getNextSnapProbability } from "../service/snap/getNextSnapProbability";
 
-const CELEBRATION_DURATION_MS = 3200;
+const CELEBRATION_DURATION_MS = 5200;
 
 export namespace useSnapGame {
 	export type Phase =
