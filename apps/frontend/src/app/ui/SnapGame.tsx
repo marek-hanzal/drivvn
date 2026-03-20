@@ -1,11 +1,7 @@
-import { withDrawCardsExistingDeckMutation } from "@drivvn/sdk/mutation/drawCardsExistingDeck";
-import { withGetShuffledDeckQuery } from "@drivvn/sdk/query/getShuffledDeck";
 import { Button } from "@use-pico/client/ui/button";
 import { Container } from "@use-pico/client/ui/container";
-import { type FC, startTransition, useEffect, useState } from "react";
-import { applyDrawResult } from "../service/snap/applyDrawResult";
-import { createInitialSnapState } from "../service/snap/createInitialSnapState";
-import { isDeckComplete } from "../service/snap/isDeckComplete";
+import type { FC } from "react";
+import { useSnapGame } from "../hook/useSnapGame";
 import { SnapCardSlot } from "./SnapCardSlot";
 
 const PLACEHOLDER_ALT = "Card placeholder";
@@ -15,69 +11,17 @@ const toCardAlt = (value: string, suit: string) => {
 };
 
 export const SnapGame: FC = () => {
-	const { data: deck } = withGetShuffledDeckQuery.useSuspenseQuery({
-		query: {
-			deck_count: 1,
-		},
-	});
-	const invalidateDeck = withGetShuffledDeckQuery.useInvalidate({
-		query: {
-			deck_count: 1,
-		},
-	});
-	const drawCardsMutation = withDrawCardsExistingDeckMutation.useMutation();
-	const [state, setState] = useState(() => createInitialSnapState(deck.remaining));
-	const [isDrawing, setIsDrawing] = useState(false);
-	const [isResetting, setIsResetting] = useState(false);
-
-	/* biome-ignore lint/correctness/useExhaustiveDependencies: deckId intentionally resets local game state when a brand-new shuffled deck is mounted. */
-	useEffect(() => {
-		setState(createInitialSnapState(deck.remaining));
-	}, [
-		deck.deck_id,
-		deck.remaining,
-	]);
-
-	const onDraw = async () => {
-		setIsDrawing(true);
-
-		try {
-			const result = await drawCardsMutation.mutateAsync({
-				path: {
-					deck_id: deck.deck_id,
-				},
-				query: {
-					count: 1,
-				},
-			});
-			const [card] = result.cards;
-
-			if (!card) {
-				throw new Error("Draw endpoint returned no card.");
-			}
-
-			startTransition(() => {
-				setState((current) =>
-					applyDrawResult(current, {
-						card,
-						remaining: result.remaining,
-					}),
-				);
-			});
-		} finally {
-			setIsDrawing(false);
-		}
-	};
-
-	const onResetClick = async () => {
-		setIsResetting(true);
-
-		try {
-			await invalidateDeck();
-		} finally {
-			setIsResetting(false);
-		}
-	};
+	const {
+		currentCard,
+		previousCard,
+		message,
+		stats,
+		isComplete,
+		isDrawing,
+		isResetting,
+		draw,
+		reset,
+	} = useSnapGame();
 
 	return (
 		<Container
@@ -101,27 +45,27 @@ export const SnapGame: FC = () => {
 			>
 				<SnapCardSlot
 					alt={
-						state.previousCard
-							? toCardAlt(state.previousCard.value, state.previousCard.suit)
+						previousCard
+							? toCardAlt(previousCard.value, previousCard.suit)
 							: PLACEHOLDER_ALT
 					}
 					label={"Previous"}
-					src={state.previousCard?.image}
+					src={previousCard?.image}
 				/>
 
 				<SnapCardSlot
 					alt={
-						state.currentCard
-							? toCardAlt(state.currentCard.value, state.currentCard.suit)
+						currentCard
+							? toCardAlt(currentCard.value, currentCard.suit)
 							: PLACEHOLDER_ALT
 					}
 					label={"Current"}
-					src={state.currentCard?.image}
+					src={currentCard?.image}
 				/>
 			</Container>
 
-			{state.message ? (
-				<div className={"text-lg font-semibold tracking-[0.15em]"}>{state.message}</div>
+			{message ? (
+				<div className={"text-lg font-semibold tracking-[0.15em]"}>{message}</div>
 			) : (
 				<div
 					aria-hidden={"true"}
@@ -129,30 +73,31 @@ export const SnapGame: FC = () => {
 				/>
 			)}
 
-			{isDeckComplete(state) ? (
-				<Container
+			<Container
+				ui={{
+					layout: "vertical-centered",
+					gap: "sm",
+				}}
+			>
+				<div>{`Value matches: ${stats.valueMatches}`}</div>
+				<div>{`Suit matches: ${stats.suitMatches}`}</div>
+			</Container>
+
+			{isComplete ? (
+				<Button
+					disabled={isResetting}
+					onClick={reset}
 					ui={{
-						layout: "vertical-centered",
-						gap: "sm",
+						tone: "secondary",
+						theme: "light",
 					}}
 				>
-					<div>{`Value matches: ${state.valueMatches}`}</div>
-					<div>{`Suit matches: ${state.suitMatches}`}</div>
-					<Button
-						disabled={isResetting}
-						onClick={onResetClick}
-						ui={{
-							tone: "secondary",
-							theme: "light",
-						}}
-					>
-						Reset
-					</Button>
-				</Container>
+					Reset
+				</Button>
 			) : (
 				<Button
 					disabled={isDrawing}
-					onClick={onDraw}
+					onClick={draw}
 					ui={{
 						tone: "secondary",
 						theme: "light",
