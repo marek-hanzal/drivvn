@@ -5,7 +5,11 @@ export const CarCreateSchema = z
 	.looseObject({
 		...CarTableSchema.omit({
 			id: true,
+			colorId: true,
 		}).shape,
+		color: z.string().min(1).openapi({
+			description: "Name of the color",
+		}),
 	})
 	.strip()
 	.openapi("CarCreate", {

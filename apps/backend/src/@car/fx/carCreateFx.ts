@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { carFetchFx } from "~/@car/fx/carFetchFx";
+import { colorFetchFx } from "~/@color/fx/colorFetchFx";
 import type { CarCreateSchema } from "~/@car/schema/CarCreateSchema";
 import { KyselyContextFx } from "~/database/context/KyselyContextFx";
 import { tryDbFx } from "~/database/fx/tryDbFx";
@@ -11,13 +12,27 @@ export namespace carCreateFx {
 	}
 }
 
-export const carCreateFx = Effect.fn("carCreateFx")(function* (data: carCreateFx.Props) {
+export const carCreateFx = Effect.fn("carCreateFx")(function* ({
+	color,
+	...data
+}: carCreateFx.Props) {
 	return yield* withTransactionFx(
 		Effect.gen(function* () {
 			const { kysely } = yield* KyselyContextFx;
+			const targetColor = yield* colorFetchFx({
+				where: {
+					name: color,
+				},
+			});
 
 			const result = yield* tryDbFx(async () =>
-				kysely.insertInto("car").values(data).executeTakeFirstOrThrow(),
+				kysely
+					.insertInto("car")
+					.values({
+						...data,
+						colorId: targetColor.id,
+					})
+					.executeTakeFirstOrThrow(),
 			);
 
 			return yield* carFetchFx({
