@@ -41,6 +41,7 @@ Flat just to keep things a bit "simpler" - my current setup has major drawback w
 - You'll see some `serverless` related stuff (nitro and so on), that's because this setup is serverless friendly, but with slight modifications (on server) it may run as a classic Node.js server too
 - **`I'm really unhappy by using database-generated numeric IDs`**, I like to use `cuid2`, but to conform the task, I've used "classic" auto-gen ids.
 - I'm using SQLite, which involves some PITA, e.g. dates not being serialized automagically or JSON not being automatically parsed (like e.g. Postgres does), so I may have some pieces not so nice code because of that
+- I've skipped "better error" reporting (e.g. conflict on duplicate rows) as I've limited time I want to spent on this task...
 
 > **King of the Notes**:
 >
