@@ -6,12 +6,15 @@ import { applyDrawResult } from "../service/snap/applyDrawResult";
 import { createInitialSnapState } from "../service/snap/createInitialSnapState";
 import { getNextSnapProbability } from "../service/snap/getNextSnapProbability";
 
+const CELEBRATION_DURATION_MS = 3200;
+
 export namespace useSnapGame {
 	export type Phase =
 		| "idle"
 		| "starting"
 		| "ready"
 		| "drawing"
+		| "celebrating"
 		| "resetting"
 		| "refreshing"
 		| "completed";
@@ -54,6 +57,22 @@ export const useSnapGame = () => {
 		);
 	}, [
 		deck.deck_id,
+	]);
+
+	useEffect(() => {
+		if (phase !== "celebrating") {
+			return;
+		}
+
+		const timeout = window.setTimeout(() => {
+			setPhase("completed");
+		}, CELEBRATION_DURATION_MS);
+
+		return () => {
+			window.clearTimeout(timeout);
+		};
+	}, [
+		phase,
 	]);
 
 	const drawInternal = useCallback(async () => {
@@ -122,9 +141,16 @@ export const useSnapGame = () => {
 	]);
 
 	/**
-	 * Finish the run and show the game-over summary once no more cards can be drawn.
+	 * Finish the run and show the solitaire-style celebration before the game-over summary.
 	 */
 	const finish = useCallback(() => {
+		setPhase("celebrating");
+	}, []);
+
+	/**
+	 * Skip the celebration and jump straight to the game-over summary.
+	 */
+	const skipCelebration = useCallback(() => {
 		setPhase("completed");
 	}, []);
 
@@ -226,6 +252,7 @@ export const useSnapGame = () => {
 		start,
 		draw,
 		finish,
+		skipCelebration,
 		reset,
 		startFresh,
 	} as const;

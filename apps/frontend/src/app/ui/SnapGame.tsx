@@ -6,6 +6,7 @@ import type { FC } from "react";
 import { useSnapGame } from "../hook/useSnapGame";
 import { CurrentDeckStack, SNAP_CARD_HEIGHT_REM, SNAP_STACK_OFFSET_REM } from "./CurrentDeckStack";
 import { SnapCardSlot } from "./SnapCardSlot";
+import { WinCelebration } from "./WinCelebration";
 
 const PLACEHOLDER_ALT = "Card placeholder";
 const cardTransition = {
@@ -34,6 +35,7 @@ export const SnapGame: FC = () => {
 		start,
 		draw,
 		finish,
+		skipCelebration,
 		reset,
 		startFresh,
 	} = useSnapGame();
@@ -293,7 +295,7 @@ export const SnapGame: FC = () => {
 			</AnimatePresence>
 
 			<Button
-				disabled={phase === "drawing"}
+				disabled={phase === "drawing" || phase === "celebrating"}
 				onClick={canFinish ? finish : draw}
 				ui={{
 					tone: "primary",
@@ -304,6 +306,8 @@ export const SnapGame: FC = () => {
 			>
 				{canFinish ? "Finish" : "Draw card"}
 			</Button>
+
+			{phase === "celebrating" ? <WinCelebration onSkip={skipCelebration} /> : null}
 		</Container>
 	);
 };

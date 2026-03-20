@@ -7,6 +7,7 @@ import { SnapGame } from "../src/app/ui/SnapGame";
 let start = vi.fn(async () => {});
 let draw = vi.fn(async () => {});
 let finish = vi.fn(() => {});
+let skipCelebration = vi.fn(() => {});
 let reset = vi.fn(async () => {});
 let startFresh = vi.fn(async () => {});
 let hookState: {
@@ -31,6 +32,7 @@ vi.mock("../src/app/hook/useSnapGame", () => ({
 		start,
 		draw,
 		finish,
+		skipCelebration,
 		reset,
 		startFresh,
 	}),
@@ -77,6 +79,7 @@ describe("SnapGame", () => {
 		start = vi.fn(async () => {});
 		draw = vi.fn(async () => {});
 		finish = vi.fn(() => {});
+		skipCelebration = vi.fn(() => {});
 		reset = vi.fn(async () => {});
 		startFresh = vi.fn(async () => {});
 	});
@@ -339,6 +342,51 @@ describe("SnapGame", () => {
 
 		await waitFor(() => {
 			expect(reset).toHaveBeenCalledTimes(1);
+		});
+	});
+
+	it("shows the solitaire celebration after finish and lets the user skip to game over", async () => {
+		hookState = {
+			phase: "celebrating",
+			currentCard: createCard({
+				code: "AS",
+				value: "ACE",
+				suit: "SPADES",
+			}),
+			previousCard: createCard({
+				code: "AH",
+				value: "ACE",
+				suit: "HEARTS",
+			}),
+			message: undefined,
+			stats: {
+				valueMatches: 9,
+				suitMatches: 4,
+			},
+			totalCards: 52,
+			drawnCount: 52,
+			remainingCount: 0,
+			canFinish: true,
+			nextSnapProbability: 0,
+		};
+
+		render(<SnapGame />);
+
+		expect(
+			screen.getByRole("button", {
+				name: "Solitaire celebration",
+			}),
+		).toBeInTheDocument();
+		expect(screen.getByText("Click anywhere to skip")).toBeInTheDocument();
+
+		fireEvent.click(
+			screen.getByRole("button", {
+				name: "Solitaire celebration",
+			}),
+		);
+
+		await waitFor(() => {
+			expect(skipCelebration).toHaveBeenCalledTimes(1);
 		});
 	});
 
