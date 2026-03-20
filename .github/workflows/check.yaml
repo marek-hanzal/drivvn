@@ -10,6 +10,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6.0.2
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v6.3.0
+        with:
+          node-version: "24"
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2.2.0
         with:

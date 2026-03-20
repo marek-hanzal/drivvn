@@ -13,9 +13,9 @@ export const CarTableSchema = z
 			description: "How cool the car is in the make's roaster",
 		}),
 		builtAt: z.coerce.date().openapi({
-				description: "Whe the car has been built",
-				type: "string",
-			}),
+			description: "Whe the car has been built",
+			type: "string",
+		}),
 	})
 	.strip()
 	.openapi("Car", {
