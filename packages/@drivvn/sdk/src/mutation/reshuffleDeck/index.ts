@@ -2,8 +2,8 @@ import { withMutation } from "@use-pico/client/mutation";
 import { withApi } from "@use-pico/common/api";
 import { reshuffleDeck } from "../../api/client/sdk.gen";
 import type { tReshuffleDeckRequest, tReshuffleDeckResponse } from "../../api/client/types.gen";
-import { withSuccess } from "../_shared";
 import type { tErrorResponse, tSuccessResponse } from "../_shared";
+import { withSuccess } from "../_shared";
 
 export type tReshuffleDeckMutation = Omit<tReshuffleDeckRequest, "url">;
 export type tReshuffleDeckMutationResponse = tSuccessResponse<tReshuffleDeckResponse[200]>;

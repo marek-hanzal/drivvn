@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"build": "vite build",
-		"no:dev": "vite",
+		"dev": "vite",
 		"preview": "NITRO_PRESET=node_server vite build --mode production && PORT=3030 node .output/server/index.mjs",
 		"typecheck": "tsc --noEmit"
 	},
@@ -15,6 +15,7 @@
 		"@tanstack/react-router": "1.168.1",
 		"@tanstack/react-router-ssr-query": "1.166.10",
 		"@tanstack/react-start": "1.167.1",
+		"@use-pico/client": "workspace:*",
 		"luxon": "3.7.2",
 		"react": "19.2.4",
 		"react-dom": "19.2.4",

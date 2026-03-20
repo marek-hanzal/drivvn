@@ -5,8 +5,8 @@ import type {
 	tReturnCardsToDeckRequest,
 	tReturnCardsToDeckResponse,
 } from "../../api/client/types.gen";
-import { withSuccess } from "../_shared";
 import type { tErrorResponse, tSuccessResponse } from "../_shared";
+import { withSuccess } from "../_shared";
 
 export type tReturnCardsToDeckMutation = Omit<tReturnCardsToDeckRequest, "url">;
 export type tReturnCardsToDeckMutationResponse = tSuccessResponse<tReturnCardsToDeckResponse[200]>;
