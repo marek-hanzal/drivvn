@@ -4,12 +4,13 @@ import type {
 	tReturnCardsToPileRequest,
 	tReturnCardsToPileResponse,
 } from "../../api/client/types.gen";
+import { type tSuccessResponse, withSuccess } from "../../mutation/_shared";
 
 export type tReturnCardsToPileQuery = Omit<tReturnCardsToPileRequest, "url">;
 
 export const withReturnCardsToPileQuery = withQuery<
 	tReturnCardsToPileQuery,
-	tReturnCardsToPileResponse[200]
+	tSuccessResponse<tReturnCardsToPileResponse[200]>
 >({
 	keys(variables) {
 		if (!variables) {
@@ -33,6 +34,8 @@ export const withReturnCardsToPileQuery = withQuery<
 		return returnCardsToPile({
 			...variables,
 			throwOnError: true,
-		}).then((res) => res.data);
+		})
+			.then((res) => res.data)
+			.then(withSuccess);
 	},
 });

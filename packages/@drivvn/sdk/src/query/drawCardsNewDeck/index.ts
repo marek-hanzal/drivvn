@@ -4,12 +4,13 @@ import type {
 	tDrawCardsNewDeckRequest,
 	tDrawCardsNewDeckResponse,
 } from "../../api/client/types.gen";
+import { type tSuccessResponse, withSuccess } from "../../mutation/_shared";
 
 export type tDrawCardsNewDeckQuery = Omit<tDrawCardsNewDeckRequest, "url">;
 
 export const withDrawCardsNewDeckQuery = withQuery<
 	tDrawCardsNewDeckQuery | undefined,
-	tDrawCardsNewDeckResponse[200]
+	tSuccessResponse<tDrawCardsNewDeckResponse[200]>
 >({
 	keys(variables) {
 		return [
@@ -23,6 +24,8 @@ export const withDrawCardsNewDeckQuery = withQuery<
 		return drawCardsNewDeck({
 			...variables,
 			throwOnError: true,
-		}).then((res) => res.data);
+		})
+			.then((res) => res.data)
+			.then(withSuccess);
 	},
 });

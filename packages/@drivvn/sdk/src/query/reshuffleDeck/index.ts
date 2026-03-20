@@ -1,10 +1,14 @@
 import { withQuery } from "@use-pico/client/query";
 import { reshuffleDeck } from "../../api/client/sdk.gen";
 import type { tReshuffleDeckRequest, tReshuffleDeckResponse } from "../../api/client/types.gen";
+import { type tSuccessResponse, withSuccess } from "../../mutation/_shared";
 
 export type tReshuffleDeckQuery = Omit<tReshuffleDeckRequest, "url">;
 
-export const withReshuffleDeckQuery = withQuery<tReshuffleDeckQuery, tReshuffleDeckResponse[200]>({
+export const withReshuffleDeckQuery = withQuery<
+	tReshuffleDeckQuery,
+	tSuccessResponse<tReshuffleDeckResponse[200]>
+>({
 	keys(variables) {
 		if (!variables) {
 			return [
@@ -24,6 +28,8 @@ export const withReshuffleDeckQuery = withQuery<tReshuffleDeckQuery, tReshuffleD
 		return reshuffleDeck({
 			...variables,
 			throwOnError: true,
-		}).then((res) => res.data);
+		})
+			.then((res) => res.data)
+			.then(withSuccess);
 	},
 });

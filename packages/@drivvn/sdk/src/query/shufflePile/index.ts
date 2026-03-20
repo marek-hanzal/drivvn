@@ -1,10 +1,14 @@
 import { withQuery } from "@use-pico/client/query";
 import { shufflePile } from "../../api/client/sdk.gen";
 import type { tShufflePileRequest, tShufflePileResponse } from "../../api/client/types.gen";
+import { type tSuccessResponse, withSuccess } from "../../mutation/_shared";
 
 export type tShufflePileQuery = Omit<tShufflePileRequest, "url">;
 
-export const withShufflePileQuery = withQuery<tShufflePileQuery, tShufflePileResponse[200]>({
+export const withShufflePileQuery = withQuery<
+	tShufflePileQuery,
+	tSuccessResponse<tShufflePileResponse[200]>
+>({
 	keys(variables) {
 		if (!variables) {
 			return [
@@ -27,6 +31,8 @@ export const withShufflePileQuery = withQuery<tShufflePileQuery, tShufflePileRes
 		return shufflePile({
 			...variables,
 			throwOnError: true,
-		}).then((res) => res.data);
+		})
+			.then((res) => res.data)
+			.then(withSuccess);
 	},
 });

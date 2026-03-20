@@ -1,9 +1,25 @@
+import { withDrawCardsExistingDeckMutation } from "@drivvn/sdk/mutation/drawCardsExistingDeck";
+import { withGetShuffledDeckMutation } from "@drivvn/sdk/mutation/getShuffledDeck";
+import { withGetShuffledDeckQuery } from "@drivvn/sdk/query/getShuffledDeck";
 import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "@use-pico/client/ui/button";
 import { Container } from "@use-pico/client/ui/container";
+import { useState } from "react";
+import { SnapGame } from "~/app/ui/SnapGame";
 
 export const Route = createFileRoute("/")({
+	async loader({ context }) {
+		return await withGetShuffledDeckQuery.ensure(context.queryClient, {
+			query: {
+				deck_count: 1,
+			},
+		});
+	},
 	component() {
+		const initialDeck = Route.useLoaderData();
+		const [deck, setDeck] = useState(initialDeck);
+		const drawCardsMutation = withDrawCardsExistingDeckMutation.useMutation();
+		const getShuffledDeckMutation = withGetShuffledDeckMutation.useMutation();
+
 		return (
 			<Container
 				ui={{
@@ -16,68 +32,41 @@ export const Route = createFileRoute("/")({
 						layout: "vertical-centered",
 						width: "full",
 						height: "full",
-						gap: "4xl",
 					}}
 				>
-					<Container
-						ui={{
-							flow: "horizontal",
-							items: "start",
-							gap: "4xl",
-						}}
-						className={[
-							"w-fit",
-							"max-w-full",
-						]}
-					>
-						<Container
-							data-ui={"Card"}
-							ui={{
-								tone: "secondary",
-								theme: "light",
-								background: "default",
-								shadow: true,
-								border: true,
-								round: "default",
-							}}
-							className={[
-								"aspect-63/88",
-								"w-40",
-								"shrink-0",
-							]}
-						>
-							A
-						</Container>
+					<SnapGame
+						deckId={deck.deck_id}
+						initialRemaining={deck.remaining}
+						onDrawCard={async () => {
+							const result = await drawCardsMutation.mutateAsync({
+								path: {
+									deck_id: deck.deck_id,
+								},
+								query: {
+									count: 1,
+								},
+							});
+							const [card] = result.cards;
 
-						<Container
-							data-ui={"Card"}
-							ui={{
-								tone: "secondary",
-								theme: "light",
-								background: "default",
-								shadow: true,
-								border: true,
-								round: "default",
-							}}
-							className={[
-								"aspect-63/88",
-								"w-40",
-								"shrink-0",
-							]}
-						>
-							B
-						</Container>
-					</Container>
+							if (!card) {
+								throw new Error("Draw endpoint returned no card.");
+							}
 
-					<Button
-						ui={{
-							tone: "primary",
-							theme: "light",
-							inner: "2xl",
+							return {
+								card,
+								remaining: result.remaining,
+							};
 						}}
-					>
-						The Button
-					</Button>
+						onReset={async () => {
+							const nextDeck = await getShuffledDeckMutation.mutateAsync({
+								query: {
+									deck_count: 1,
+								},
+							});
+
+							setDeck(nextDeck);
+						}}
+					/>
 				</Container>
 			</Container>
 		);

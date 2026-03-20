@@ -4,12 +4,13 @@ import type {
 	tDrawFromPileBottomRequest,
 	tDrawFromPileBottomResponse,
 } from "../../api/client/types.gen";
+import { type tSuccessResponse, withSuccess } from "../../mutation/_shared";
 
 export type tDrawFromPileBottomQuery = Omit<tDrawFromPileBottomRequest, "url">;
 
 export const withDrawFromPileBottomQuery = withQuery<
 	tDrawFromPileBottomQuery,
-	tDrawFromPileBottomResponse[200]
+	tSuccessResponse<tDrawFromPileBottomResponse[200]>
 >({
 	keys(variables) {
 		if (!variables) {
@@ -35,6 +36,8 @@ export const withDrawFromPileBottomQuery = withQuery<
 		return drawFromPileBottom({
 			...variables,
 			throwOnError: true,
-		}).then((res) => res.data);
+		})
+			.then((res) => res.data)
+			.then(withSuccess);
 	},
 });

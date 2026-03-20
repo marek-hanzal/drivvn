@@ -4,12 +4,13 @@ import type {
 	tGetUnshuffledDeckRequest,
 	tGetUnshuffledDeckResponse,
 } from "../../api/client/types.gen";
+import { type tSuccessResponse, withSuccess } from "../../mutation/_shared";
 
 export type tGetUnshuffledDeckQuery = Omit<tGetUnshuffledDeckRequest, "url">;
 
 export const withGetUnshuffledDeckQuery = withQuery<
 	tGetUnshuffledDeckQuery | undefined,
-	tGetUnshuffledDeckResponse[200]
+	tSuccessResponse<tGetUnshuffledDeckResponse[200]>
 >({
 	keys(variables) {
 		return [
@@ -22,6 +23,8 @@ export const withGetUnshuffledDeckQuery = withQuery<
 		return getUnshuffledDeck({
 			...variables,
 			throwOnError: true,
-		}).then((res) => res.data);
+		})
+			.then((res) => res.data)
+			.then(withSuccess);
 	},
 });

@@ -1,10 +1,14 @@
 import { withQuery } from "@use-pico/client/query";
 import { listPile } from "../../api/client/sdk.gen";
 import type { tListPileRequest, tListPileResponse } from "../../api/client/types.gen";
+import { type tSuccessResponse, withSuccess } from "../../mutation/_shared";
 
 export type tListPileQuery = Omit<tListPileRequest, "url">;
 
-export const withListPileQuery = withQuery<tListPileQuery, tListPileResponse[200]>({
+export const withListPileQuery = withQuery<
+	tListPileQuery,
+	tSuccessResponse<tListPileResponse[200]>
+>({
 	keys(variables) {
 		if (!variables) {
 			return [
@@ -27,6 +31,8 @@ export const withListPileQuery = withQuery<tListPileQuery, tListPileResponse[200
 		return listPile({
 			...variables,
 			throwOnError: true,
-		}).then((res) => res.data);
+		})
+			.then((res) => res.data)
+			.then(withSuccess);
 	},
 });

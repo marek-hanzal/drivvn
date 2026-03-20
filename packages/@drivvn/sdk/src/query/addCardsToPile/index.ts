@@ -1,12 +1,13 @@
 import { withQuery } from "@use-pico/client/query";
 import { addCardsToPile } from "../../api/client/sdk.gen";
 import type { tAddCardsToPileRequest, tAddCardsToPileResponse } from "../../api/client/types.gen";
+import { type tSuccessResponse, withSuccess } from "../../mutation/_shared";
 
 export type tAddCardsToPileQuery = Omit<tAddCardsToPileRequest, "url">;
 
 export const withAddCardsToPileQuery = withQuery<
 	tAddCardsToPileQuery,
-	tAddCardsToPileResponse[200]
+	tSuccessResponse<tAddCardsToPileResponse[200]>
 >({
 	keys(variables) {
 		if (!variables) {
@@ -30,6 +31,8 @@ export const withAddCardsToPileQuery = withQuery<
 		return addCardsToPile({
 			...variables,
 			throwOnError: true,
-		}).then((res) => res.data);
+		})
+			.then((res) => res.data)
+			.then(withSuccess);
 	},
 });

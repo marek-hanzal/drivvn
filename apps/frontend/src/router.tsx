@@ -1,3 +1,4 @@
+import { client as drivvnClient } from "@drivvn/sdk/api/client";
 import { keepPreviousData, QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
@@ -5,6 +6,10 @@ import { Container, SpinnerContainer } from "@use-pico/client/ui/container";
 import { routeTree } from "./_route";
 
 export async function getRouter() {
+	drivvnClient.setConfig({
+		baseURL: "https://deckofcardsapi.com/api",
+	});
+
 	const staleTime = 5 * 60 * 1_000;
 
 	const queryClient = new QueryClient({

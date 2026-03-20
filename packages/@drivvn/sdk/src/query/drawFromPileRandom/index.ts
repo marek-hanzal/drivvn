@@ -4,12 +4,13 @@ import type {
 	tDrawFromPileRandomRequest,
 	tDrawFromPileRandomResponse,
 } from "../../api/client/types.gen";
+import { type tSuccessResponse, withSuccess } from "../../mutation/_shared";
 
 export type tDrawFromPileRandomQuery = Omit<tDrawFromPileRandomRequest, "url">;
 
 export const withDrawFromPileRandomQuery = withQuery<
 	tDrawFromPileRandomQuery,
-	tDrawFromPileRandomResponse[200]
+	tSuccessResponse<tDrawFromPileRandomResponse[200]>
 >({
 	keys(variables) {
 		if (!variables) {
@@ -35,6 +36,8 @@ export const withDrawFromPileRandomQuery = withQuery<
 		return drawFromPileRandom({
 			...variables,
 			throwOnError: true,
-		}).then((res) => res.data);
+		})
+			.then((res) => res.data)
+			.then(withSuccess);
 	},
 });
