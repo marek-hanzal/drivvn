@@ -1,4 +1,10 @@
 import { Effect } from "effect";
+import { withCollectionApiFx } from "~/@car/collection";
+import { withCountApiFx } from "~/@car/count";
+import { withCreateApiFx } from "~/@car/create";
+import { withDeleteApiFx } from "~/@car/delete";
+import { withFetchApiFx } from "~/@car/fetch";
+import { withPatchApiFx } from "~/@car/patch";
 import { RoutesContextFx } from "~/route/context/RoutesContextFx";
 
 export const withCarApiFx = Effect.fn("withCarApiFx")(function* () {
@@ -12,7 +18,12 @@ export const withCarApiFx = Effect.fn("withCarApiFx")(function* () {
 	});
 
 	yield* Effect.all([
-		//
+		withCreateApiFx(),
+		withPatchApiFx(),
+		withFetchApiFx(),
+		withCollectionApiFx(),
+		withCountApiFx(),
+		withDeleteApiFx(),
 	]);
 
 	root.route("/api/car", carHono);
