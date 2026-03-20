@@ -1,12 +1,19 @@
 import { Effect } from "effect";
-import { DatabaseError } from "pg";
 import { RuntimeErrorFx } from "~/error/RuntimeErrorFx";
 
+type DbError = Error & {
+	code?: string;
+};
+
+function isDbError(error: unknown): error is DbError {
+	return error instanceof Error && "code" in error;
+}
+
 export namespace tryDbFx {
-	export type Handlers = Partial<Record<string, (e: DatabaseError) => any>>;
+	export type Handlers = Partial<Record<string, (e: DbError) => any>>;
 
 	export type ErrorChannel<M extends Handlers> = {
-		[K in keyof M]: M[K] extends (e: DatabaseError) => infer R ? R : never;
+		[K in keyof M]: M[K] extends (e: DbError) => infer R ? R : never;
 	}[keyof M];
 }
 
@@ -15,7 +22,7 @@ const tryDbFxImpl = Effect.fn("tryDbFx")(
 		Effect.tryPromise({
 			try: run,
 			catch: (error: unknown) => {
-				if (error instanceof DatabaseError) {
+				if (isDbError(error)) {
 					const code = error.code ?? "(no-code)";
 					const mapped = handler?.[code]?.(error);
 					if (mapped !== undefined) {
