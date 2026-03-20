@@ -20,7 +20,7 @@ export const withCreateApiFx = Effect.fn("withCreateApiFx")(function* () {
 	carHono.openapi(
 		createRoute({
 			method: "post",
-			path: "/create",
+			path: "/cars",
 			description: "Create a new car",
 			operationId: "apiCarCreate",
 			request: {

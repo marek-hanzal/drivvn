@@ -50,6 +50,7 @@ Flat just to keep things a bit "simpler" - my current setup has major drawback w
 - **`I'm really unhappy by using database-generated numeric IDs`**, I like to use `cuid2`, but to conform the task, I've used "classic" auto-gen ids.
 - Tests run against PostgreSQL and cover the actual backend effects directly.
 - I've skipped "better error" reporting (e.g. conflict on duplicate rows) as I've limited time I want to spent on this task...
+- Zod may do quite complex validation (e.g. non-negative IDs and so on), but for simplicity, I'll keep "default" validations
 
 > **King of the Notes**:
 >

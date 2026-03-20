@@ -4,7 +4,6 @@ import { zodGuardFx } from "@use-pico/common/schema";
 import { Effect } from "effect";
 import { carCollectionFx } from "~/@car/fx/carCollectionFx";
 import { CarItemSchema } from "~/@car/schema/CarItemSchema";
-import { CarQuerySchema } from "~/@car/schema/CarQuerySchema";
 import { noticeZodError } from "~/@common/notice/noticeZodError";
 import { withKyselyFx } from "~/database/fx/withKyselyFx";
 import { withCatchFx } from "~/effect/withCatchFx";
@@ -18,19 +17,11 @@ export const withCollectionApiFx = Effect.fn("withCollectionApiFx")(function* ()
 
 	carHono.openapi(
 		createRoute({
-			method: "post",
-			path: "/collection",
-			description: "Returns cars based on provided parameters",
+			method: "get",
+			path: "/cars",
+			description: "Returns car collection (default set)",
 			operationId: "apiCarCollection",
-			request: {
-				body: {
-					content: {
-						"application/json": {
-							schema: CarQuerySchema,
-						},
-					},
-				},
-			},
+			request: {},
 			responses: {
 				200: {
 					content: {
@@ -60,7 +51,16 @@ export const withCollectionApiFx = Effect.fn("withCollectionApiFx")(function* ()
 					yield* zodGuardFx({
 						schema: CollectionSchema,
 						dataFx: carCollectionFx({
-							...c.req.valid("json"),
+							/**
+							 * Hardcoded limitations, but we may switch the whole endpoint to "POST" and
+							 * whole query object can be passed down the collection.
+							 *
+							 * Or eventually we can extract some of the values to "query" params and use them here.
+							 */
+							cursor: {
+								page: 0,
+								size: 200,
+							},
 						}),
 					}),
 					200,

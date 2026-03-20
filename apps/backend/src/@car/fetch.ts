@@ -1,9 +1,8 @@
 import { createRoute } from "@hono/zod-openapi";
 import type { NotFoundErrorFx, ZodErrorFx } from "@use-pico/common/error";
-import { zodGuardFx } from "@use-pico/common/schema";
+import { EntitySchema, zodGuardFx } from "@use-pico/common/schema";
 import { Effect } from "effect";
 import { carFetchFx } from "~/@car/fx/carFetchFx";
-import { CarQuerySchema } from "~/@car/schema/CarQuerySchema";
 import { CarSchema } from "~/@car/schema/CarSchema";
 import { NotFoundNotice } from "~/@common/notice/NotFoundNotice";
 import { noticeZodError } from "~/@common/notice/noticeZodError";
@@ -18,18 +17,11 @@ export const withFetchApiFx = Effect.fn("withFetchApiFx")(function* () {
 	carHono.openapi(
 		createRoute({
 			method: "post",
-			path: "/fetch",
+			path: "/car/{id}",
 			description: "Return a car based on the provided query",
 			operationId: "apiCarFetch",
 			request: {
-				body: {
-					content: {
-						"application/json": {
-							schema: CarQuerySchema,
-						},
-					},
-					description: "Query object for car fetch",
-				},
+				params: EntitySchema,
 			},
 			responses: {
 				200: {
@@ -63,11 +55,17 @@ export const withFetchApiFx = Effect.fn("withFetchApiFx")(function* () {
 			summary: "Fetch a car based on the provided query",
 		}),
 		async (c) => {
+			const { id } = c.req.valid("param");
+
 			return Effect.gen(function* () {
 				return c.json(
 					yield* zodGuardFx({
 						schema: CarSchema,
-						dataFx: carFetchFx(c.req.valid("json")),
+						dataFx: carFetchFx({
+							where: {
+								id,
+							},
+						}),
 					}),
 					200,
 				);
