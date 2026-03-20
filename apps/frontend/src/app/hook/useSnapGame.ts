@@ -214,6 +214,7 @@ export const useSnapGame = () => {
 		message: state.message,
 		totalCards: state.deckConfig.totalCards,
 		drawnCount: state.drawnCount,
+		remainingCount: state.remaining,
 		stats: {
 			valueMatches: state.valueMatches,
 			suitMatches: state.suitMatches,

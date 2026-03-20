@@ -16,6 +16,7 @@ let hookState: {
 	message?: string;
 	totalCards: number;
 	drawnCount: number;
+	remainingCount: number;
 	stats: {
 		valueMatches: number;
 		suitMatches: number;
@@ -65,6 +66,7 @@ describe("SnapGame", () => {
 			message: undefined,
 			totalCards: 52,
 			drawnCount: 0,
+			remainingCount: 52,
 			stats: {
 				valueMatches: 0,
 				suitMatches: 0,
@@ -115,6 +117,11 @@ describe("SnapGame", () => {
 		render(<SnapGame />);
 
 		expect(screen.getAllByLabelText("Card placeholder")).toHaveLength(2);
+		expect(
+			screen.getAllByRole("img", {
+				name: "Deck back",
+			}),
+		).toHaveLength(5);
 		expect(screen.getByText("Card 0 of 52")).toBeInTheDocument();
 		expect(screen.getByText("Next snap chance: 0.0%")).toBeInTheDocument();
 		expect(screen.getByText("Value matches: 0")).toBeInTheDocument();
@@ -146,6 +153,7 @@ describe("SnapGame", () => {
 			},
 			totalCards: 52,
 			drawnCount: 12,
+			remainingCount: 40,
 			canFinish: false,
 			nextSnapProbability: 0.325,
 		};
@@ -206,12 +214,18 @@ describe("SnapGame", () => {
 			},
 			totalCards: 52,
 			drawnCount: 52,
+			remainingCount: 0,
 			canFinish: true,
 			nextSnapProbability: 0,
 		};
 
 		render(<SnapGame />);
 
+		expect(
+			screen.queryAllByRole("img", {
+				name: "Deck back",
+			}),
+		).toHaveLength(0);
 		expect(screen.getByText("Card 52 of 52")).toBeInTheDocument();
 		expect(
 			screen.getByRole("button", {
@@ -229,6 +243,40 @@ describe("SnapGame", () => {
 		await waitFor(() => {
 			expect(finish).toHaveBeenCalledTimes(1);
 		});
+	});
+
+	it("shows only the remaining number of deck backs once the count drops below five", () => {
+		hookState = {
+			phase: "ready",
+			currentCard: createCard({
+				code: "5S",
+				value: "5",
+				suit: "SPADES",
+			}),
+			previousCard: createCard({
+				code: "4H",
+				value: "4",
+				suit: "HEARTS",
+			}),
+			message: undefined,
+			stats: {
+				valueMatches: 0,
+				suitMatches: 0,
+			},
+			totalCards: 52,
+			drawnCount: 49,
+			remainingCount: 3,
+			canFinish: false,
+			nextSnapProbability: 0,
+		};
+
+		render(<SnapGame />);
+
+		expect(
+			screen.getAllByRole("img", {
+				name: "Deck back",
+			}),
+		).toHaveLength(3);
 	});
 
 	it("shows game over status without cards and calls reset", async () => {
@@ -251,6 +299,7 @@ describe("SnapGame", () => {
 			},
 			totalCards: 52,
 			drawnCount: 52,
+			remainingCount: 0,
 			canFinish: false,
 			nextSnapProbability: 0,
 		};

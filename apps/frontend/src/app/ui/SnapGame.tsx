@@ -3,6 +3,7 @@ import { Container } from "@use-pico/client/ui/container";
 import { Status } from "@use-pico/client/ui/status";
 import type { FC } from "react";
 import { useSnapGame } from "../hook/useSnapGame";
+import { CurrentDeckStack } from "./CurrentDeckStack";
 import { SnapCardSlot } from "./SnapCardSlot";
 
 const PLACEHOLDER_ALT = "Card placeholder";
@@ -19,6 +20,7 @@ export const SnapGame: FC = () => {
 		message,
 		totalCards,
 		drawnCount,
+		remainingCount,
 		stats,
 		canFinish,
 		nextSnapProbability,
@@ -150,13 +152,14 @@ export const SnapGame: FC = () => {
 					src={previousCard?.image}
 				/>
 
-				<SnapCardSlot
+				<CurrentDeckStack
 					alt={
 						currentCard
 							? toCardAlt(currentCard.value, currentCard.suit)
 							: PLACEHOLDER_ALT
 					}
 					src={currentCard?.image}
+					remainingCount={remainingCount}
 				/>
 			</Container>
 
