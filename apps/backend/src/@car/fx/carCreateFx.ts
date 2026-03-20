@@ -1,5 +1,4 @@
 import { Effect } from "effect";
-import { DateTime } from "luxon";
 import { carFetchFx } from "~/@car/fx/carFetchFx";
 import type { CarCreateSchema } from "~/@car/schema/CarCreateSchema";
 import { colorFetchFx } from "~/@color/fx/colorFetchFx";
@@ -15,7 +14,6 @@ export namespace carCreateFx {
 
 export const carCreateFx = Effect.fn("carCreateFx")(function* ({
 	color,
-	builtAt,
 	...data
 }: carCreateFx.Props) {
 	return yield* withTransactionFx(
@@ -32,15 +30,15 @@ export const carCreateFx = Effect.fn("carCreateFx")(function* ({
 					.insertInto("car")
 					.values({
 						...data,
-						builtAt: DateTime.fromISO(builtAt).toSQLDate() ?? DateTime.now().toSQL(),
 						colorId: targetColor.id,
 					})
+					.returning("id")
 					.executeTakeFirstOrThrow(),
 			);
 
 			return yield* carFetchFx({
 				where: {
-					id: String(result.insertId),
+					id: String(result.id),
 				},
 			});
 		}),

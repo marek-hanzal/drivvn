@@ -2,11 +2,14 @@ import { Effect } from "effect";
 import { colorCollectionFx } from "~/@color/fx/colorCollectionFx";
 import { colorCreateFx } from "~/@color/fx/colorCreateFx";
 import { colorPatchFx } from "~/@color/fx/colorPatchFx";
-import { withTestKyselyFx } from "~test/support/testDatabase";
+import { testabase } from "~test/testabase";
+import { withRuntimeFx } from "~test/withRuntimeFx";
 
 describe("color/patch", () => {
-	it("patches a color exposed by the effect", () =>
-		Effect.gen(function* () {
+	it("patches a color exposed by the effect", async () => {
+		const database = await testabase("color-patch");
+
+		await Effect.gen(function* () {
 			const originalName = "Color Patch Before";
 			const updatedName = "Color Patch After";
 
@@ -38,5 +41,6 @@ describe("color/patch", () => {
 
 			expect(collection).toHaveLength(1);
 			expect(collection[0]).toMatchObject(patch);
-		}).pipe(withTestKyselyFx, Effect.runPromise));
+		}).pipe(withRuntimeFx(database), Effect.runPromise);
+	});
 });

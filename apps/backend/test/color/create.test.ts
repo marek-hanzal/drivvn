@@ -1,11 +1,14 @@
 import { Effect } from "effect";
 import { colorCollectionFx } from "~/@color/fx/colorCollectionFx";
 import { colorCreateFx } from "~/@color/fx/colorCreateFx";
-import { withTestKyselyFx } from "~test/support/testDatabase";
+import { testabase } from "~test/testabase";
+import { withRuntimeFx } from "~test/withRuntimeFx";
 
 describe("color/create", () => {
-	it("creates a color exposed by the effect", () =>
-		Effect.gen(function* () {
+	it("creates a color exposed by the effect", async () => {
+		const database = await testabase("color-create");
+
+		await Effect.gen(function* () {
 			const name = "Color Create Test";
 
 			const create = yield* colorCreateFx({
@@ -25,5 +28,6 @@ describe("color/create", () => {
 
 			expect(collection).toHaveLength(1);
 			expect(collection[0]).toMatchObject(create);
-		}).pipe(withTestKyselyFx, Effect.runPromise));
+		}).pipe(withRuntimeFx(database), Effect.runPromise);
+	});
 });

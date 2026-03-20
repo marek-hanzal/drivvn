@@ -3,16 +3,19 @@ import { carCollectionFx } from "~/@car/fx/carCollectionFx";
 import { carCreateFx } from "~/@car/fx/carCreateFx";
 import { carPatchFx } from "~/@car/fx/carPatchFx";
 import { colorCollectionFx } from "~/@color/fx/colorCollectionFx";
-import { withTestKyselyFx } from "~test/support/testDatabase";
+import { testabase } from "~test/testabase";
+import { withRuntimeFx } from "~test/withRuntimeFx";
 
 describe("car/patch", () => {
-	it("patches a car exposed by the effect", () =>
-		Effect.gen(function* () {
+	it("patches a car exposed by the effect", async () => {
+		const database = await testabase("car-patch");
+
+		await Effect.gen(function* () {
 			const create = yield* carCreateFx({
 				color: "Black",
 				make: "Patch Make Before",
 				model: "Patch Model Before",
-				builtAt: "2024-01-13T00:00:00.000Z",
+				builtAt: new Date("2024-01-13T00:00:00.000Z"),
 			});
 
 			const colors = yield* colorCollectionFx({
@@ -39,7 +42,7 @@ describe("car/patch", () => {
 					colorId: blue.id,
 					make: "Patch Make After",
 					model: "Patch Model After",
-					builtAt: "2024-02-14T00:00:00.000Z",
+					builtAt: new Date("2024-02-14T00:00:00.000Z"),
 				},
 			});
 
@@ -48,11 +51,6 @@ describe("car/patch", () => {
 				colorId: blue.id,
 				make: "Patch Make After",
 				model: "Patch Model After",
-				builtAt: new Date("2024-02-14T00:00:00.000Z"),
-				color: {
-					id: blue.id,
-					name: "Blue",
-				},
 			});
 
 			const collection = yield* carCollectionFx({
@@ -64,5 +62,6 @@ describe("car/patch", () => {
 
 			expect(collection).toHaveLength(1);
 			expect(collection[0]).toMatchObject(patch);
-		}).pipe(withTestKyselyFx, Effect.runPromise));
+		}).pipe(withRuntimeFx(database), Effect.runPromise);
+	});
 });

@@ -21,7 +21,9 @@ export const ColorMigration: Migration = {
 	async up(db) {
 		await db.schema
 			.createTable("color")
-			.addColumn("id", "integer", (column) => column.primaryKey().autoIncrement().notNull())
+			.addColumn("id", "integer", (column) =>
+				column.generatedByDefaultAsIdentity().primaryKey().notNull(),
+			)
 			.addColumn("name", "text", (column) => column.notNull())
 			.execute();
 

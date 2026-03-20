@@ -1,14 +1,17 @@
 import { Effect } from "effect";
 import { carCollectionFx } from "~/@car/fx/carCollectionFx";
 import { carCreateFx } from "~/@car/fx/carCreateFx";
-import { withTestKyselyFx } from "~test/support/testDatabase";
+import { testabase } from "~test/testabase";
+import { withRuntimeFx } from "~test/withRuntimeFx";
 
 describe("car/collection", () => {
-	it("returns a filtered car collection", () =>
-		Effect.gen(function* () {
+	it("returns a filtered car collection", async () => {
+		const database = await testabase("car-collection");
+
+		await Effect.gen(function* () {
 			const make = "Collection Make";
 			const model = "Collection Model";
-			const builtAt = "2024-01-10T00:00:00.000Z";
+			const builtAt = new Date("2024-01-10T00:00:00.000Z");
 
 			const create = yield* carCreateFx({
 				color: "Black",
@@ -35,5 +38,6 @@ describe("car/collection", () => {
 					name: "Black",
 				},
 			});
-		}).pipe(withTestKyselyFx, Effect.runPromise));
+		}).pipe(withRuntimeFx(database), Effect.runPromise);
+	});
 });

@@ -1,11 +1,14 @@
 import { Effect } from "effect";
 import { colorCollectionFx } from "~/@color/fx/colorCollectionFx";
 import { colorCreateFx } from "~/@color/fx/colorCreateFx";
-import { withTestKyselyFx } from "~test/support/testDatabase";
+import { testabase } from "~test/testabase";
+import { withRuntimeFx } from "~test/withRuntimeFx";
 
 describe("color/collection", () => {
-	it("returns a filtered color collection", () =>
-		Effect.gen(function* () {
+	it("returns a filtered color collection", async () => {
+		const database = await testabase("color-collection");
+
+		await Effect.gen(function* () {
 			const name = "Color Collection Test";
 
 			yield* colorCreateFx({
@@ -23,5 +26,6 @@ describe("color/collection", () => {
 				id: expect.any(Number),
 				name,
 			});
-		}).pipe(withTestKyselyFx, Effect.runPromise));
+		}).pipe(withRuntimeFx(database), Effect.runPromise);
+	});
 });

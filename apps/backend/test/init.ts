@@ -11,9 +11,9 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 
 type SetupResult = (() => Promise<void>) | void;
 
-const IMAGE = "zbav-se.me:postgres";
-const CONTAINER_NAME = "zbav-seme-test-postgres";
-export const VOLUME_NAME = "zbav-seme-test-postgres-data";
+const IMAGE = "postgres:17-alpine";
+const CONTAINER_NAME = "drivvn-test-postgres";
+export const VOLUME_NAME = "drivvn-test-postgres-data";
 
 const DATABASE_PORT = 55432;
 const DATABASE_URL = `postgresql://test:test@127.0.0.1:${DATABASE_PORT}`;
@@ -97,38 +97,6 @@ export default async function globalSetup(): Promise<SetupResult> {
 		],
 		"Docker is not available",
 	);
-
-	const imageExists = (() => {
-		try {
-			const { stdout } = sh(
-				[
-					"docker",
-					"image",
-					"inspect",
-					IMAGE,
-				],
-				"",
-			);
-			return stdout.length > 0;
-		} catch {
-			return false;
-		}
-	})();
-
-	if (!imageExists) {
-		console.log("Building Postgres image");
-		sh(
-			[
-				"docker",
-				"build",
-				"--platform=linux/amd64",
-				"-t",
-				IMAGE,
-				".",
-			],
-			`Failed to build image "${IMAGE}"`,
-		);
-	}
 
 	shQuiet([
 		"docker",

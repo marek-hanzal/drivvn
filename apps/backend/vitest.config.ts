@@ -22,10 +22,6 @@ export default defineConfig({
 		globalSetup: [
 			"./test/init.ts",
 		],
-		environment: "node",
-		setupFiles: [
-			"./test/setup.ts",
-		],
 		globals: true,
 		include: [
 			"test/**/*.test.ts",
@@ -37,9 +33,9 @@ export default defineConfig({
 			shuffle: false,
 		},
 		pool: "forks",
-		maxConcurrency: 1,
+		maxConcurrency: 4,
 		//
-		maxWorkers: 1,
+		maxWorkers: 8,
 		//
 		coverage: {
 			enabled: false,

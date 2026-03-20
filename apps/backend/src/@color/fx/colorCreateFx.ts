@@ -17,12 +17,12 @@ export const colorCreateFx = Effect.fn("colorCreateFx")(function* (data: colorCr
 			const { kysely } = yield* KyselyContextFx;
 
 			const result = yield* tryDbFx(async () =>
-				kysely.insertInto("color").values(data).executeTakeFirstOrThrow(),
+				kysely.insertInto("color").values(data).returning("id").executeTakeFirstOrThrow(),
 			);
 
 			return yield* colorFetchFx({
 				where: {
-					id: String(result.insertId),
+					id: String(result.id),
 				},
 			});
 		}),

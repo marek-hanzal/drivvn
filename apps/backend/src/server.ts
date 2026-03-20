@@ -1,7 +1,7 @@
 import { DialectContextFx } from "@use-pico/common/database";
-import Database from "better-sqlite3";
 import { Effect } from "effect";
-import { CompiledQuery, SqliteDialect } from "kysely";
+import { PostgresDialect } from "kysely";
+import { Pool } from "pg";
 import { withCarApiFx } from "~/@car/withCarApiFx";
 import { withCarHono } from "~/@car/withCarHono";
 import { withColorApiFx } from "~/@color/withColorApiFx";
@@ -32,17 +32,13 @@ const app = await Effect.gen(function* () {
 	});
 
 	const databaseConfig = ServerDatabaseSchema.parse(process.env);
-	const sqlite = new Database(databaseConfig.SERVER_DATABASE_PATH);
 	const kyselyContext = yield* database.pipe(
 		Effect.provideService(
 			DialectContextFx,
-			new SqliteDialect({
-				database: sqlite,
-				async onCreateConnection(connection) {
-					await connection.executeQuery(CompiledQuery.raw("PRAGMA foreign_keys = ON"));
-					await connection.executeQuery(CompiledQuery.raw("PRAGMA journal_mode = WAL"));
-					await connection.executeQuery(CompiledQuery.raw("PRAGMA busy_timeout = 5000"));
-				},
+			new PostgresDialect({
+				pool: new Pool({
+					connectionString: databaseConfig.SERVER_DATABASE_URL,
+				}),
 			}),
 		),
 	);

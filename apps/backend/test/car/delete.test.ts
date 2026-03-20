@@ -2,14 +2,17 @@ import { Effect } from "effect";
 import { carCollectionFx } from "~/@car/fx/carCollectionFx";
 import { carCreateFx } from "~/@car/fx/carCreateFx";
 import { carDeleteFx } from "~/@car/fx/carDeleteFx";
-import { withTestKyselyFx } from "~test/support/testDatabase";
+import { testabase } from "~test/testabase";
+import { withRuntimeFx } from "~test/withRuntimeFx";
 
 describe("car/delete", () => {
-	it("deletes a car exposed by the effect", () =>
-		Effect.gen(function* () {
+	it("deletes a car exposed by the effect", async () => {
+		const database = await testabase("car-delete");
+
+		await Effect.gen(function* () {
 			const make = "Delete Make";
 			const model = "Delete Model";
-			const builtAt = "2024-01-12T00:00:00.000Z";
+			const builtAt = new Date("2024-01-12T00:00:00.000Z");
 
 			const create = yield* carCreateFx({
 				color: "Black",
@@ -34,5 +37,6 @@ describe("car/delete", () => {
 			});
 
 			expect(collection).toHaveLength(0);
-		}).pipe(withTestKyselyFx, Effect.runPromise));
+		}).pipe(withRuntimeFx(database), Effect.runPromise);
+	});
 });
