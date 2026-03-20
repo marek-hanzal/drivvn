@@ -1,6 +1,6 @@
 import { withDrawCardsExistingDeckMutation } from "@drivvn/sdk/mutation/drawCardsExistingDeck";
 import { withGetShuffledDeckQuery } from "@drivvn/sdk/query/getShuffledDeck";
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, useCallback, useEffect, useState } from "react";
 import { applyDrawResult } from "../service/snap/applyDrawResult";
 import { createInitialSnapState } from "../service/snap/createInitialSnapState";
 import { getCardProgressLabel } from "../service/snap/getCardProgressLabel";
@@ -10,6 +10,8 @@ import { isDeckComplete } from "../service/snap/isDeckComplete";
 export namespace useSnapGame {
 	export type Phase = "idle" | "starting" | "ready" | "drawing" | "resetting";
 }
+
+export type SnapGamePhase = useSnapGame.Phase;
 
 export const useSnapGame = () => {
 	const deckQuery = withGetShuffledDeckQuery.useSuspenseQuery({
@@ -36,7 +38,7 @@ export const useSnapGame = () => {
 		deck.remaining,
 	]);
 
-	const drawInternal = async () => {
+	const drawInternal = useCallback(async () => {
 		const result = await drawCardsMutation.mutateAsync({
 			path: {
 				deck_id: deck.deck_id,
@@ -59,12 +61,15 @@ export const useSnapGame = () => {
 				}),
 			);
 		});
-	};
+	}, [
+		deck.deck_id,
+		drawCardsMutation,
+	]);
 
 	/**
 	 * Start the game and immediately draw the first card from the shuffled deck.
 	 */
-	const start = async () => {
+	const start = useCallback(async () => {
 		setPhase("starting");
 
 		try {
@@ -74,12 +79,14 @@ export const useSnapGame = () => {
 			setPhase("idle");
 			throw error;
 		}
-	};
+	}, [
+		drawInternal,
+	]);
 
 	/**
 	 * Draw the next card from the current shuffled deck.
 	 */
-	const draw = async () => {
+	const draw = useCallback(async () => {
 		setPhase("drawing");
 
 		try {
@@ -89,12 +96,14 @@ export const useSnapGame = () => {
 			setPhase("ready");
 			throw error;
 		}
-	};
+	}, [
+		drawInternal,
+	]);
 
 	/**
 	 * Reset the game by invalidating the shuffled deck query and immediately starting a fresh run.
 	 */
-	const reset = async () => {
+	const reset = useCallback(async () => {
 		setPhase("resetting");
 
 		try {
@@ -134,7 +143,11 @@ export const useSnapGame = () => {
 			setPhase("ready");
 			throw error;
 		}
-	};
+	}, [
+		deckQuery,
+		drawCardsMutation,
+		invalidateDeck,
+	]);
 
 	return {
 		phase,
