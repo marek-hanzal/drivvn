@@ -71,8 +71,9 @@ export const Route = createFileRoute("/")({
 
 					<Button
 						ui={{
-							tone: "secondary",
+							tone: "primary",
 							theme: "light",
+							inner: "2xl",
 						}}
 					>
 						The Button
