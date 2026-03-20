@@ -1,5 +1,6 @@
 import { Context } from "effect";
 import type { withCarHono } from "~/@car/withCarHono";
+import type { withPublicHono } from "~/@public/withPublicHono";
 import type { withHono } from "~/hono/withHono";
 
 export interface RoutesContext {
@@ -7,6 +8,10 @@ export interface RoutesContext {
 	 * Root app hono (/ route)
 	 */
 	root: withHono;
+	/**
+	 * Public routes (no auth required).
+	 */
+	publicHono: withPublicHono;
 	/**
 	 * Domain specific hono's ("root" routes, usually using different separation).
 	 */

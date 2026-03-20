@@ -1,4 +1,8 @@
-# AI Usage
+## Runtime
+
+This app expects `Bun` as a runtime (server has dependency on Bun's sqlite implementation).
+
+## AI Usage
 
 - Concepts, code architecture, repo setup, everything belongs to me (and concepts invented by clever people before me), no LLM involved.
 

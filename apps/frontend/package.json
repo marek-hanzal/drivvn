@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"build": "vite build",
-		"dev": "vite",
+		"no:dev": "vite",
 		"preview": "NITRO_PRESET=node_server vite build --mode production && PORT=3030 node .output/server/index.mjs",
 		"typecheck": "tsc --noEmit"
 	},
