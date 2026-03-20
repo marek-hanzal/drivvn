@@ -16,9 +16,7 @@ export const carDeleteFx = Effect.fn("carDeleteFx")(function* (query: carDeleteF
 
 			const car = yield* carFetchFx(query);
 
-			yield* tryDbFx(async () =>
-				kysely.deleteFrom("car").where("id", "=", car.id).execute(),
-			);
+			yield* tryDbFx(async () => kysely.deleteFrom("car").where("id", "=", car.id).execute());
 
 			return car;
 		}),

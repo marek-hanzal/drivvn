@@ -4,9 +4,7 @@ export const CarMigration: Migration = {
 	async up(db) {
 		await db.schema
 			.createTable("car")
-			.addColumn("id", "integer", (column) =>
-				column.primaryKey().autoIncrement().notNull(),
-			)
+			.addColumn("id", "integer", (column) => column.primaryKey().autoIncrement().notNull())
 			.addColumn("colorId", "integer", (column) =>
 				column.notNull().references("color.id").onDelete("restrict").onUpdate("cascade"),
 			)
@@ -15,16 +13,15 @@ export const CarMigration: Migration = {
 			.addColumn("builtAt", "text", (column) => column.notNull())
 			.execute();
 
-		await db.schema
-			.createIndex("car_color_id_idx")
-			.on("car")
-			.column("colorId")
-			.execute();
+		await db.schema.createIndex("car_color_id_idx").on("car").column("colorId").execute();
 
 		await db.schema
 			.createIndex("car_make_model_idx")
 			.on("car")
-			.columns(["make", "model"])
+			.columns([
+				"make",
+				"model",
+			])
 			.execute();
 	},
 };
