@@ -32,13 +32,14 @@ export default defineConfig({
 		],
 		passWithNoTests: true,
 		isolate: false,
+		fileParallelism: false,
 		sequence: {
 			shuffle: false,
 		},
 		pool: "forks",
-		maxConcurrency: 4,
+		maxConcurrency: 1,
 		//
-		maxWorkers: 12,
+		maxWorkers: 1,
 		//
 		coverage: {
 			enabled: false,

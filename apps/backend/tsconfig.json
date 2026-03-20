@@ -3,6 +3,7 @@
 	"compilerOptions": {
 		"types": [
 			"@types/bun",
+			"vitest/globals",
 			"node"
 		],
 		"plugins": [

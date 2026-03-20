@@ -33,6 +33,7 @@
 	"typescript.experimental.useTsgo": false,
 	"chatgpt.commentCodeLensEnabled": false,
 	"cSpell.words": [
+		"automagically",
 		"bunx",
 		"drivvn",
 		"formatty",

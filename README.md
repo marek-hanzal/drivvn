@@ -1,6 +1,8 @@
 ## How to run
+- Copy .env.example -> .env(.local), it's sqlite, so it should work
 - `bun install`
 - `bun run dev` (we'll skip production runtime mess)
+- `bun run test` from repo root to run tests (it properly reads .env)
 
 Backend:
 http://localhost:3031/ (OpenAPI spec), you've to run migration endpoint (from the Scalar UI).
@@ -38,6 +40,7 @@ Flat just to keep things a bit "simpler" - my current setup has major drawback w
 - I'm used to `Biome` as somewhat all-in-one linte-formatty tool
 - You'll see some `serverless` related stuff (nitro and so on), that's because this setup is serverless friendly, but with slight modifications (on server) it may run as a classic Node.js server too
 - **`I'm really unhappy by using database-generated numeric IDs`**, I like to use `cuid2`, but to conform the task, I've used "classic" auto-gen ids.
+- I'm using SQLite, which involves some PITA, e.g. dates not being serialized automagically or JSON not being automatically parsed (like e.g. Postgres does), so I may have some pieces not so nice code because of that
 
 > **King of the Notes**:
 >
