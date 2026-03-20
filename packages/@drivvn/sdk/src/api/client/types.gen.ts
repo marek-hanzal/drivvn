@@ -5,29 +5,35 @@ export type clientOptions = {
 };
 
 export type tDeck = {
-    deck_id?: string;
-    success?: boolean;
-    shuffled?: boolean;
-    remaining?: number;
+    success: true;
+    deck_id: string;
+    shuffled: boolean;
+    remaining: number;
 };
 
-export type tDrawnCards = {
-    success?: boolean;
-    deck_id?: string;
-    cards?: Array<tCard>;
-    remaining?: tRemaining;
-    piles?: tPiles;
+export type tDeckDrawResult = {
+    success: true;
+    deck_id: string;
+    cards: Array<tCard>;
+    remaining: tRemaining;
+};
+
+export type tPileDrawResult = {
+    success: true;
+    deck_id: string;
+    cards: Array<tCard>;
+    piles: tPiles;
 };
 
 export type tCard = {
-    code?: string;
-    image?: string;
+    code: string;
+    image: string;
     images?: {
         svg?: string;
         png?: string;
     };
-    value?: string;
-    suit?: 'SPADES' | 'CLUBS' | 'HEARTS' | 'DIAMONDS';
+    value: string;
+    suit: 'SPADES' | 'CLUBS' | 'HEARTS' | 'DIAMONDS';
 };
 
 /**
@@ -35,16 +41,23 @@ export type tCard = {
  */
 export type tCardCodes = string;
 
-export type tPileResult = {
-    success?: boolean;
-    deck_id?: string;
+export type tReturnToDeckResult = {
+    success: true;
+    deck_id: string;
     shuffled?: boolean;
-    remaining?: tRemaining;
-    piles?: tPiles;
+    remaining: tRemaining;
+};
+
+export type tPileOperationResult = {
+    success: true;
+    deck_id: string;
+    shuffled?: boolean;
+    remaining: tRemaining;
+    piles: tPiles;
 };
 
 export type tPile = {
-    remaining?: tRemaining;
+    remaining: tRemaining;
     cards?: Array<tCard>;
 };
 
@@ -53,6 +66,21 @@ export type tPiles = {
 };
 
 export type tRemaining = number | string;
+
+export type tErrorResponse = {
+    success: false;
+    error: string;
+};
+
+export type tDeckResponse = tDeck | tErrorResponse;
+
+export type tDeckDrawResponse = tDeckDrawResult | tErrorResponse;
+
+export type tReturnToDeckResponse = tReturnToDeckResult | tErrorResponse;
+
+export type tPileOperationResponse = tPileOperationResult | tErrorResponse;
+
+export type tPileDrawResponse = tPileDrawResult | tErrorResponse;
 
 export type tGetUnshuffledDeckRequest = {
     body?: never;
@@ -71,7 +99,7 @@ export type tGetUnshuffledDeckResponse = {
     /**
      * One or more combined card decks
      */
-    200: tDeck;
+    200: tDeckResponse;
 };
 
 export type getUnshuffledDeckResponse = tGetUnshuffledDeckResponse[keyof tGetUnshuffledDeckResponse];
@@ -93,7 +121,7 @@ export type tGetShuffledDeckResponse = {
     /**
      * One or more combined card decks, or a partial deck if cards is specified in query string.
      */
-    200: tDeck;
+    200: tDeckResponse;
 };
 
 export type getShuffledDeckResponse = tGetShuffledDeckResponse[keyof tGetShuffledDeckResponse];
@@ -119,7 +147,7 @@ export type tDrawCardsExistingDeckResponse = {
     /**
      * One or more combined card decks
      */
-    200: tDrawnCards;
+    200: tDeckDrawResponse;
 };
 
 export type drawCardsExistingDeckResponse = tDrawCardsExistingDeckResponse[keyof tDrawCardsExistingDeckResponse];
@@ -140,7 +168,7 @@ export type tDrawCardsNewDeckResponse = {
     /**
      * One or more combined card decks
      */
-    200: tDrawnCards;
+    200: tDeckDrawResponse;
 };
 
 export type drawCardsNewDeckResponse = tDrawCardsNewDeckResponse[keyof tDrawCardsNewDeckResponse];
@@ -160,7 +188,7 @@ export type tReshuffleDeckResponse = {
     /**
      * One or more combined card decks
      */
-    200: tDeck;
+    200: tDeckResponse;
 };
 
 export type reshuffleDeckResponse = tReshuffleDeckResponse[keyof tReshuffleDeckResponse];
@@ -178,9 +206,9 @@ export type tReturnCardsToDeckRequest = {
 
 export type tReturnCardsToDeckResponse = {
     /**
-     * Result of adding to card pile
+     * Result of returning cards to the deck
      */
-    200: tPileResult;
+    200: tReturnToDeckResponse;
 };
 
 export type returnCardsToDeckResponse = tReturnCardsToDeckResponse[keyof tReturnCardsToDeckResponse];
@@ -201,7 +229,7 @@ export type tAddCardsToPileResponse = {
     /**
      * Result of adding to card pile
      */
-    200: tPileResult;
+    200: tPileOperationResponse;
 };
 
 export type addCardsToPileResponse = tAddCardsToPileResponse[keyof tAddCardsToPileResponse];
@@ -218,9 +246,9 @@ export type tShufflePileRequest = {
 
 export type tShufflePileResponse = {
     /**
-     * Result of adding to card pile
+     * Result of shuffling a pile
      */
-    200: tPileResult;
+    200: tPileOperationResponse;
 };
 
 export type shufflePileResponse = tShufflePileResponse[keyof tShufflePileResponse];
@@ -237,9 +265,9 @@ export type tListPileRequest = {
 
 export type tListPileResponse = {
     /**
-     * Result of adding to card pile
+     * Result of listing a pile
      */
-    200: tPileResult;
+    200: tPileOperationResponse;
 };
 
 export type listPileResponse = tListPileResponse[keyof tListPileResponse];
@@ -261,7 +289,7 @@ export type tDrawFromPileResponse = {
     /**
      * Drawn cards from pile
      */
-    200: tDrawnCards;
+    200: tPileDrawResponse;
 };
 
 export type drawFromPileResponse = tDrawFromPileResponse[keyof tDrawFromPileResponse];
@@ -282,7 +310,7 @@ export type tDrawFromPileBottomResponse = {
     /**
      * Drawn cards from the bottom of a pile
      */
-    200: tDrawnCards;
+    200: tPileDrawResponse;
 };
 
 export type drawFromPileBottomResponse = tDrawFromPileBottomResponse[keyof tDrawFromPileBottomResponse];
@@ -303,7 +331,7 @@ export type tDrawFromPileRandomResponse = {
     /**
      * Randomly drawn cards from a pile
      */
-    200: tDrawnCards;
+    200: tPileDrawResponse;
 };
 
 export type drawFromPileRandomResponse = tDrawFromPileRandomResponse[keyof tDrawFromPileRandomResponse];
@@ -322,9 +350,9 @@ export type tReturnCardsToPileRequest = {
 
 export type tReturnCardsToPileResponse = {
     /**
-     * Result of adding to card pile
+     * Result of returning cards from a pile to the deck
      */
-    200: tPileResult;
+    200: tPileOperationResponse;
 };
 
 export type returnCardsToPileResponse = tReturnCardsToPileResponse[keyof tReturnCardsToPileResponse];

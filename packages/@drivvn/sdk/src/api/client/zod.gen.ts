@@ -3,28 +3,28 @@
 import * as z from 'zod';
 
 export const zDeck = z.object({
-    deck_id: z.string().optional(),
-    success: z.boolean().optional(),
-    shuffled: z.boolean().optional(),
-    remaining: z.int().min(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' }).optional()
+    success: z.literal(true),
+    deck_id: z.string(),
+    shuffled: z.boolean(),
+    remaining: z.int().min(-2147483648, { error: 'Invalid value: Expected int32 to be >= -2147483648' }).max(2147483647, { error: 'Invalid value: Expected int32 to be <= 2147483647' })
 });
 
 export type zDeck = z.infer<typeof zDeck>;
 
 export const zCard = z.object({
-    code: z.string().optional(),
-    image: z.string().optional(),
+    code: z.string(),
+    image: z.string(),
     images: z.object({
         svg: z.string().optional(),
         png: z.string().optional()
     }).optional(),
-    value: z.string().optional(),
+    value: z.string(),
     suit: z.enum([
         'SPADES',
         'CLUBS',
         'HEARTS',
         'DIAMONDS'
-    ]).optional()
+    ])
 });
 
 export type zCard = z.infer<typeof zCard>;
@@ -45,8 +45,26 @@ export const zRemaining = z.union([
 
 export type zRemaining = z.infer<typeof zRemaining>;
 
+export const zDeckDrawResult = z.object({
+    success: z.literal(true),
+    deck_id: z.string(),
+    cards: z.array(zCard),
+    remaining: zRemaining
+});
+
+export type zDeckDrawResult = z.infer<typeof zDeckDrawResult>;
+
+export const zReturnToDeckResult = z.object({
+    success: z.literal(true),
+    deck_id: z.string(),
+    shuffled: z.boolean().optional(),
+    remaining: zRemaining
+});
+
+export type zReturnToDeckResult = z.infer<typeof zReturnToDeckResult>;
+
 export const zPile = z.object({
-    remaining: zRemaining.optional(),
+    remaining: zRemaining,
     cards: z.array(zCard).optional()
 });
 
@@ -56,25 +74,66 @@ export const zPiles = z.record(z.string(), zPile);
 
 export type zPiles = z.infer<typeof zPiles>;
 
-export const zDrawnCards = z.object({
-    success: z.boolean().optional(),
-    deck_id: z.string().optional(),
-    cards: z.array(zCard).optional(),
-    remaining: zRemaining.optional(),
-    piles: zPiles.optional()
+export const zPileDrawResult = z.object({
+    success: z.literal(true),
+    deck_id: z.string(),
+    cards: z.array(zCard),
+    piles: zPiles
 });
 
-export type zDrawnCards = z.infer<typeof zDrawnCards>;
+export type zPileDrawResult = z.infer<typeof zPileDrawResult>;
 
-export const zPileResult = z.object({
-    success: z.boolean().optional(),
-    deck_id: z.string().optional(),
+export const zPileOperationResult = z.object({
+    success: z.literal(true),
+    deck_id: z.string(),
     shuffled: z.boolean().optional(),
-    remaining: zRemaining.optional(),
-    piles: zPiles.optional()
+    remaining: zRemaining,
+    piles: zPiles
 });
 
-export type zPileResult = z.infer<typeof zPileResult>;
+export type zPileOperationResult = z.infer<typeof zPileOperationResult>;
+
+export const zErrorResponse = z.object({
+    success: z.literal(false),
+    error: z.string()
+});
+
+export type zErrorResponse = z.infer<typeof zErrorResponse>;
+
+export const zDeckResponse = z.union([
+    zDeck,
+    zErrorResponse
+]);
+
+export type zDeckResponse = z.infer<typeof zDeckResponse>;
+
+export const zDeckDrawResponse = z.union([
+    zDeckDrawResult,
+    zErrorResponse
+]);
+
+export type zDeckDrawResponse = z.infer<typeof zDeckDrawResponse>;
+
+export const zReturnToDeckResponse = z.union([
+    zReturnToDeckResult,
+    zErrorResponse
+]);
+
+export type zReturnToDeckResponse = z.infer<typeof zReturnToDeckResponse>;
+
+export const zPileOperationResponse = z.union([
+    zPileOperationResult,
+    zErrorResponse
+]);
+
+export type zPileOperationResponse = z.infer<typeof zPileOperationResponse>;
+
+export const zPileDrawResponse = z.union([
+    zPileDrawResult,
+    zErrorResponse
+]);
+
+export type zPileDrawResponse = z.infer<typeof zPileDrawResponse>;
 
 export const zGetUnshuffledDeckData = z.object({
     body: z.never().optional(),
@@ -92,7 +151,7 @@ export type zgetUnshuffledDeckRequest = z.infer<typeof zGetUnshuffledDeckData>;
 /**
  * One or more combined card decks
  */
-export const zGetUnshuffledDeckResponse = zDeck;
+export const zGetUnshuffledDeckResponse = zDeckResponse;
 
 export type zgetUnshuffledDeckResponse = z.infer<typeof zGetUnshuffledDeckResponse>;
 
@@ -112,7 +171,7 @@ export type zgetShuffledDeckRequest = z.infer<typeof zGetShuffledDeckData>;
 /**
  * One or more combined card decks, or a partial deck if cards is specified in query string.
  */
-export const zGetShuffledDeckResponse = zDeck;
+export const zGetShuffledDeckResponse = zDeckResponse;
 
 export type zgetShuffledDeckResponse = z.infer<typeof zGetShuffledDeckResponse>;
 
@@ -135,7 +194,7 @@ export type zdrawCardsExistingDeckRequest = z.infer<typeof zDrawCardsExistingDec
 /**
  * One or more combined card decks
  */
-export const zDrawCardsExistingDeckResponse = zDrawnCards;
+export const zDrawCardsExistingDeckResponse = zDeckDrawResponse;
 
 export type zdrawCardsExistingDeckResponse = z.infer<typeof zDrawCardsExistingDeckResponse>;
 
@@ -154,7 +213,7 @@ export type zdrawCardsNewDeckRequest = z.infer<typeof zDrawCardsNewDeckData>;
 /**
  * One or more combined card decks
  */
-export const zDrawCardsNewDeckResponse = zDrawnCards;
+export const zDrawCardsNewDeckResponse = zDeckDrawResponse;
 
 export type zdrawCardsNewDeckResponse = z.infer<typeof zDrawCardsNewDeckResponse>;
 
@@ -173,7 +232,7 @@ export type zreshuffleDeckRequest = z.infer<typeof zReshuffleDeckData>;
 /**
  * One or more combined card decks
  */
-export const zReshuffleDeckResponse = zDeck;
+export const zReshuffleDeckResponse = zDeckResponse;
 
 export type zreshuffleDeckResponse = z.infer<typeof zReshuffleDeckResponse>;
 
@@ -190,9 +249,9 @@ export const zReturnCardsToDeckData = z.object({
 export type zreturnCardsToDeckRequest = z.infer<typeof zReturnCardsToDeckData>;
 
 /**
- * Result of adding to card pile
+ * Result of returning cards to the deck
  */
-export const zReturnCardsToDeckResponse = zPileResult;
+export const zReturnCardsToDeckResponse = zReturnToDeckResponse;
 
 export type zreturnCardsToDeckResponse = z.infer<typeof zReturnCardsToDeckResponse>;
 
@@ -212,7 +271,7 @@ export type zaddCardsToPileRequest = z.infer<typeof zAddCardsToPileData>;
 /**
  * Result of adding to card pile
  */
-export const zAddCardsToPileResponse = zPileResult;
+export const zAddCardsToPileResponse = zPileOperationResponse;
 
 export type zaddCardsToPileResponse = z.infer<typeof zAddCardsToPileResponse>;
 
@@ -228,9 +287,9 @@ export const zShufflePileData = z.object({
 export type zshufflePileRequest = z.infer<typeof zShufflePileData>;
 
 /**
- * Result of adding to card pile
+ * Result of shuffling a pile
  */
-export const zShufflePileResponse = zPileResult;
+export const zShufflePileResponse = zPileOperationResponse;
 
 export type zshufflePileResponse = z.infer<typeof zShufflePileResponse>;
 
@@ -246,9 +305,9 @@ export const zListPileData = z.object({
 export type zlistPileRequest = z.infer<typeof zListPileData>;
 
 /**
- * Result of adding to card pile
+ * Result of listing a pile
  */
-export const zListPileResponse = zPileResult;
+export const zListPileResponse = zPileOperationResponse;
 
 export type zlistPileResponse = z.infer<typeof zListPileResponse>;
 
@@ -269,7 +328,7 @@ export type zdrawFromPileRequest = z.infer<typeof zDrawFromPileData>;
 /**
  * Drawn cards from pile
  */
-export const zDrawFromPileResponse = zDrawnCards;
+export const zDrawFromPileResponse = zPileDrawResponse;
 
 export type zdrawFromPileResponse = z.infer<typeof zDrawFromPileResponse>;
 
@@ -289,7 +348,7 @@ export type zdrawFromPileBottomRequest = z.infer<typeof zDrawFromPileBottomData>
 /**
  * Drawn cards from the bottom of a pile
  */
-export const zDrawFromPileBottomResponse = zDrawnCards;
+export const zDrawFromPileBottomResponse = zPileDrawResponse;
 
 export type zdrawFromPileBottomResponse = z.infer<typeof zDrawFromPileBottomResponse>;
 
@@ -309,7 +368,7 @@ export type zdrawFromPileRandomRequest = z.infer<typeof zDrawFromPileRandomData>
 /**
  * Randomly drawn cards from a pile
  */
-export const zDrawFromPileRandomResponse = zDrawnCards;
+export const zDrawFromPileRandomResponse = zPileDrawResponse;
 
 export type zdrawFromPileRandomResponse = z.infer<typeof zDrawFromPileRandomResponse>;
 
@@ -327,8 +386,8 @@ export const zReturnCardsToPileData = z.object({
 export type zreturnCardsToPileRequest = z.infer<typeof zReturnCardsToPileData>;
 
 /**
- * Result of adding to card pile
+ * Result of returning cards from a pile to the deck
  */
-export const zReturnCardsToPileResponse = zPileResult;
+export const zReturnCardsToPileResponse = zPileOperationResponse;
 
 export type zreturnCardsToPileResponse = z.infer<typeof zReturnCardsToPileResponse>;

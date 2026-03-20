@@ -38,7 +38,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Deck"
+                $ref: "#/components/schemas/DeckResponse"
   /deck/new/shuffle/:
     summary: Retrieve one or more combined decks of shuffled cards.
     get:
@@ -66,7 +66,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Deck"
+                $ref: "#/components/schemas/DeckResponse"
   /deck/{deck_id}/draw/:
     summary: Draw a specified number of cards from given deck
     get:
@@ -95,7 +95,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DrawnCards"
+                $ref: "#/components/schemas/DeckDrawResponse"
   /deck/new/draw/:
     summary: Draw a specified number of cards from a brand new deck
     get:
@@ -117,7 +117,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DrawnCards"
+                $ref: "#/components/schemas/DeckDrawResponse"
   /deck/{deck_id}/shuffle/:
     get:
       summary: Reshuffle an existing deck
@@ -142,7 +142,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Deck"
+                $ref: "#/components/schemas/DeckResponse"
   /deck/{deck_id}/return/:
     get:
       summary: Return cards to deck
@@ -163,11 +163,11 @@ paths:
             example: hyi02vw0n72p
       responses:
         "200":
-          description: Result of adding to card pile
+          description: Result of returning cards to the deck
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PileResult"
+                $ref: "#/components/schemas/ReturnToDeckResponse"
   /deck/{deck_id}/pile/{pile_name}/add/:
     get:
       summary: Add cards to a new or existing pile. If pile doesn't exist, it will be created.
@@ -197,7 +197,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PileResult"
+                $ref: "#/components/schemas/PileOperationResponse"
   /deck/{deck_id}/pile/{pile_name}/shuffle/:
     get:
       summary: Shuffle a specified pile.
@@ -218,11 +218,11 @@ paths:
             type: string
       responses:
         "200":
-          description: Result of adding to card pile
+          description: Result of shuffling a pile
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PileResult"
+                $ref: "#/components/schemas/PileOperationResponse"
   /deck/{deck_id}/pile/{pile_name}/list/:
     get:
       summary: List contents of a pile
@@ -243,11 +243,11 @@ paths:
             type: string
       responses:
         "200":
-          description: Result of adding to card pile
+          description: Result of listing a pile
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PileResult"
+                $ref: "#/components/schemas/PileOperationResponse"
   /deck/{deck_id}/pile/{pile_name}/draw/:
     get:
       summary: Draw from pile
@@ -283,7 +283,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DrawnCards"
+                $ref: "#/components/schemas/PileDrawResponse"
   /deck/{deck_id}/pile/{pile_name}/draw/bottom/:
     get:
       summary: Draw from the bottom of a pile
@@ -314,7 +314,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DrawnCards"
+                $ref: "#/components/schemas/PileDrawResponse"
   /deck/{deck_id}/pile/{pile_name}/draw/random/:
     get:
       summary: Draw random cards from a pile
@@ -345,7 +345,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DrawnCards"
+                $ref: "#/components/schemas/PileDrawResponse"
   /deck/{deck_id}/pile/{pile_name}/return/:
     get:
       summary: Return cards to deck
@@ -371,22 +371,28 @@ paths:
             type: string
       responses:
         "200":
-          description: Result of adding to card pile
+          description: Result of returning cards from a pile to the deck
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/PileResult"
+                $ref: "#/components/schemas/PileOperationResponse"
 components:
   schemas:
     Deck:
       type: object
+      required:
+        - success
+        - deck_id
+        - shuffled
+        - remaining
       properties:
+        success:
+          type: boolean
+          enum:
+            - true
         deck_id:
           type: string
           example: 3p40paa87x90
-        success:
-          type: boolean
-          example: true
         shuffled:
           type: boolean
           example: true
@@ -394,11 +400,18 @@ components:
           type: integer
           format: int32
           example: 52
-    DrawnCards:
+    DeckDrawResult:
       type: object
+      required:
+        - success
+        - deck_id
+        - cards
+        - remaining
       properties:
         success:
           type: boolean
+          enum:
+            - true
         deck_id:
           type: string
         cards:
@@ -408,10 +421,33 @@ components:
         remaining:
           $ref: "#/components/schemas/Remaining"
           example: 30
+    PileDrawResult:
+      type: object
+      required:
+        - success
+        - deck_id
+        - cards
+        - piles
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
+        deck_id:
+          type: string
+        cards:
+          type: array
+          items:
+            $ref: "#/components/schemas/Card"
         piles:
           $ref: "#/components/schemas/Piles"
     Card:
       type: object
+      required:
+        - code
+        - image
+        - value
+        - suit
       properties:
         code:
           type: string
@@ -444,11 +480,35 @@ components:
       type: string
       description: Comma-separated list of card codes, for example AS,2S
       example: AS,2S
-    PileResult:
+    ReturnToDeckResult:
       type: object
+      required:
+        - success
+        - deck_id
+        - remaining
       properties:
         success:
           type: boolean
+          enum:
+            - true
+        deck_id:
+          type: string
+        shuffled:
+          type: boolean
+        remaining:
+          $ref: "#/components/schemas/Remaining"
+    PileOperationResult:
+      type: object
+      required:
+        - success
+        - deck_id
+        - remaining
+        - piles
+      properties:
+        success:
+          type: boolean
+          enum:
+            - true
         deck_id:
           type: string
         shuffled:
@@ -459,6 +519,8 @@ components:
           $ref: "#/components/schemas/Piles"
     Pile:
       type: object
+      required:
+        - remaining
       properties:
         remaining:
           $ref: "#/components/schemas/Remaining"
@@ -476,3 +538,36 @@ components:
           format: int32
         - type: string
       example: 52
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          enum:
+            - false
+        error:
+          type: string
+          example: Not enough cards remaining to draw 1 additional
+    DeckResponse:
+      oneOf:
+        - $ref: "#/components/schemas/Deck"
+        - $ref: "#/components/schemas/ErrorResponse"
+    DeckDrawResponse:
+      oneOf:
+        - $ref: "#/components/schemas/DeckDrawResult"
+        - $ref: "#/components/schemas/ErrorResponse"
+    ReturnToDeckResponse:
+      oneOf:
+        - $ref: "#/components/schemas/ReturnToDeckResult"
+        - $ref: "#/components/schemas/ErrorResponse"
+    PileOperationResponse:
+      oneOf:
+        - $ref: "#/components/schemas/PileOperationResult"
+        - $ref: "#/components/schemas/ErrorResponse"
+    PileDrawResponse:
+      oneOf:
+        - $ref: "#/components/schemas/PileDrawResult"
+        - $ref: "#/components/schemas/ErrorResponse"

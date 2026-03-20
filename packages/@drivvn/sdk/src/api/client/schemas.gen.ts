@@ -2,14 +2,22 @@
 
 export const sDeck = {
     type: 'object',
+    required: [
+        'success',
+        'deck_id',
+        'shuffled',
+        'remaining'
+    ],
     properties: {
+        success: {
+            type: 'boolean',
+            enum: [
+                true
+            ]
+        },
         deck_id: {
             type: 'string',
             example: '3p40paa87x90'
-        },
-        success: {
-            type: 'boolean',
-            example: true
         },
         shuffled: {
             type: 'boolean',
@@ -23,11 +31,20 @@ export const sDeck = {
     }
 } as const;
 
-export const sDrawnCards = {
+export const sDeckDrawResult = {
     type: 'object',
+    required: [
+        'success',
+        'deck_id',
+        'cards',
+        'remaining'
+    ],
     properties: {
         success: {
-            type: 'boolean'
+            type: 'boolean',
+            enum: [
+                true
+            ]
         },
         deck_id: {
             type: 'string'
@@ -41,6 +58,33 @@ export const sDrawnCards = {
         remaining: {
             $ref: '#/components/schemas/Remaining',
             example: 30
+        }
+    }
+} as const;
+
+export const sPileDrawResult = {
+    type: 'object',
+    required: [
+        'success',
+        'deck_id',
+        'cards',
+        'piles'
+    ],
+    properties: {
+        success: {
+            type: 'boolean',
+            enum: [
+                true
+            ]
+        },
+        deck_id: {
+            type: 'string'
+        },
+        cards: {
+            type: 'array',
+            items: {
+                $ref: '#/components/schemas/Card'
+            }
         },
         piles: {
             $ref: '#/components/schemas/Piles'
@@ -50,6 +94,12 @@ export const sDrawnCards = {
 
 export const sCard = {
     type: 'object',
+    required: [
+        'code',
+        'image',
+        'value',
+        'suit'
+    ],
     properties: {
         code: {
             type: 'string',
@@ -95,11 +145,46 @@ export const sCardCodes = {
     example: 'AS,2S'
 } as const;
 
-export const sPileResult = {
+export const sReturnToDeckResult = {
     type: 'object',
+    required: [
+        'success',
+        'deck_id',
+        'remaining'
+    ],
     properties: {
         success: {
+            type: 'boolean',
+            enum: [
+                true
+            ]
+        },
+        deck_id: {
+            type: 'string'
+        },
+        shuffled: {
             type: 'boolean'
+        },
+        remaining: {
+            $ref: '#/components/schemas/Remaining'
+        }
+    }
+} as const;
+
+export const sPileOperationResult = {
+    type: 'object',
+    required: [
+        'success',
+        'deck_id',
+        'remaining',
+        'piles'
+    ],
+    properties: {
+        success: {
+            type: 'boolean',
+            enum: [
+                true
+            ]
         },
         deck_id: {
             type: 'string'
@@ -118,6 +203,9 @@ export const sPileResult = {
 
 export const sPile = {
     type: 'object',
+    required: [
+        'remaining'
+    ],
     properties: {
         remaining: {
             $ref: '#/components/schemas/Remaining'
@@ -149,4 +237,79 @@ export const sRemaining = {
         }
     ],
     example: 52
+} as const;
+
+export const sErrorResponse = {
+    type: 'object',
+    required: [
+        'success',
+        'error'
+    ],
+    properties: {
+        success: {
+            type: 'boolean',
+            enum: [
+                false
+            ]
+        },
+        error: {
+            type: 'string',
+            example: 'Not enough cards remaining to draw 1 additional'
+        }
+    }
+} as const;
+
+export const sDeckResponse = {
+    oneOf: [
+        {
+            $ref: '#/components/schemas/Deck'
+        },
+        {
+            $ref: '#/components/schemas/ErrorResponse'
+        }
+    ]
+} as const;
+
+export const sDeckDrawResponse = {
+    oneOf: [
+        {
+            $ref: '#/components/schemas/DeckDrawResult'
+        },
+        {
+            $ref: '#/components/schemas/ErrorResponse'
+        }
+    ]
+} as const;
+
+export const sReturnToDeckResponse = {
+    oneOf: [
+        {
+            $ref: '#/components/schemas/ReturnToDeckResult'
+        },
+        {
+            $ref: '#/components/schemas/ErrorResponse'
+        }
+    ]
+} as const;
+
+export const sPileOperationResponse = {
+    oneOf: [
+        {
+            $ref: '#/components/schemas/PileOperationResult'
+        },
+        {
+            $ref: '#/components/schemas/ErrorResponse'
+        }
+    ]
+} as const;
+
+export const sPileDrawResponse = {
+    oneOf: [
+        {
+            $ref: '#/components/schemas/PileDrawResult'
+        },
+        {
+            $ref: '#/components/schemas/ErrorResponse'
+        }
+    ]
 } as const;
