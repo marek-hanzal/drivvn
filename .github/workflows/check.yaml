@@ -1,0 +1,25 @@
+name: Check
+
+on:
+  push:
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2.2.0
+        with:
+          bun-version: "1.3.0"
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Check
+        run: bun run workflow:check
+
+      - name: Test
+        run: bun run test
