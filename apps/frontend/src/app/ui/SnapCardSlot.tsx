@@ -51,6 +51,7 @@ export const SnapCardSlot: FC<SnapCardSlot.Props> = ({ alt, src, label }) => {
 						"tracking-[0.2em]",
 					]}
 				>
+					{/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: Placeholder slot needs a stable accessible label for tests and screen readers. */}
 					<span aria-label={alt}>{label}</span>
 				</Container>
 			)}

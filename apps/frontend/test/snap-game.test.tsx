@@ -242,6 +242,7 @@ describe("SnapGame", () => {
 				length: 52,
 			},
 			(_, index) => {
+				// biome-ignore lint/style/noNonNullAssertion: The tuple is non-empty and modulo keeps the index in range.
 				const suit = suits[index % suits.length]!;
 				const value = index % 13 === 0 ? "ACE" : ((index % 13) + 1).toString();
 

@@ -28,6 +28,7 @@ export const SnapGame: FC<SnapGame.Props> = ({ deckId, initialRemaining, onDrawC
 	const [isDrawing, setIsDrawing] = useState(false);
 	const [isResetting, setIsResetting] = useState(false);
 
+	/* biome-ignore lint/correctness/useExhaustiveDependencies: deckId intentionally resets local game state when a brand-new shuffled deck is mounted. */
 	useEffect(() => {
 		setState(createInitialSnapState(initialRemaining));
 	}, [
