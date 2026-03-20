@@ -1,3 +1,10 @@
+## How to run
+- `bun install`
+- `bun run dev` (we'll skip production runtime mess)
+
+Backend:
+http://localhost:3031/ (OpenAPI spec), you've to run migration endpoint (from the Scalar UI).
+
 ## Runtime
 
 This app expects `Bun` as a runtime (server has dependency on Bun's sqlite implementation).
