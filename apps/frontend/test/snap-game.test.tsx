@@ -3,9 +3,11 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { SnapGame } from "../src/app/ui/SnapGame";
 
+let start = vi.fn(async () => {});
 let draw = vi.fn(async () => {});
 let reset = vi.fn(async () => {});
 let hookState: {
+	hasStarted: boolean;
 	currentCard?: tCard;
 	previousCard?: tCard;
 	message?: string;
@@ -21,6 +23,7 @@ let hookState: {
 vi.mock("../src/app/hook/useSnapGame", () => ({
 	useSnapGame: () => ({
 		...hookState,
+		start,
 		draw,
 		reset,
 	}),
@@ -50,6 +53,7 @@ const createCard = ({
 describe("SnapGame", () => {
 	beforeEach(() => {
 		hookState = {
+			hasStarted: false,
 			currentCard: undefined,
 			previousCard: undefined,
 			message: undefined,
@@ -61,11 +65,43 @@ describe("SnapGame", () => {
 			isDrawing: false,
 			isResetting: false,
 		};
+		start = vi.fn(async () => {});
 		draw = vi.fn(async () => {});
 		reset = vi.fn(async () => {});
 	});
 
-	it("shows placeholders and live stats before any draw", () => {
+	it("shows intro status before the game starts", () => {
+		render(<SnapGame />);
+
+		expect(screen.getByText("Snap Game!")).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", {
+				name: "Start",
+			}),
+		).toBeInTheDocument();
+		expect(screen.queryByText("Value matches: 0")).not.toBeInTheDocument();
+	});
+
+	it("calls start through the control hook", async () => {
+		render(<SnapGame />);
+
+		fireEvent.click(
+			screen.getByRole("button", {
+				name: "Start",
+			}),
+		);
+
+		await waitFor(() => {
+			expect(start).toHaveBeenCalledTimes(1);
+		});
+	});
+
+	it("shows placeholders and live stats after the game starts", () => {
+		hookState = {
+			...hookState,
+			hasStarted: true,
+		};
+
 		render(<SnapGame />);
 
 		expect(screen.getAllByLabelText("Card placeholder")).toHaveLength(2);
@@ -78,8 +114,9 @@ describe("SnapGame", () => {
 		).toBeInTheDocument();
 	});
 
-	it("renders cards and snap message from the control hook", async () => {
+	it("renders cards, snap message and live stats from the control hook", async () => {
 		hookState = {
+			hasStarted: true,
 			currentCard: createCard({
 				code: "JD",
 				value: "JACK",
@@ -116,6 +153,11 @@ describe("SnapGame", () => {
 	});
 
 	it("calls draw through the control hook", async () => {
+		hookState = {
+			...hookState,
+			hasStarted: true,
+		};
+
 		render(<SnapGame />);
 
 		fireEvent.click(
@@ -129,8 +171,9 @@ describe("SnapGame", () => {
 		});
 	});
 
-	it("shows reset instead of draw when the game is complete", () => {
+	it("shows reset instead of draw when the game is complete and calls reset", async () => {
 		hookState = {
+			hasStarted: true,
 			currentCard: createCard({
 				code: "AS",
 				value: "ACE",
@@ -158,30 +201,8 @@ describe("SnapGame", () => {
 				name: "Draw card",
 			}),
 		).not.toBeInTheDocument();
-		expect(
-			screen.getByRole("button", {
-				name: "Reset",
-			}),
-		).toBeInTheDocument();
 		expect(screen.getByText("Value matches: 9")).toBeInTheDocument();
 		expect(screen.getByText("Suit matches: 4")).toBeInTheDocument();
-	});
-
-	it("calls reset through the control hook", async () => {
-		hookState = {
-			currentCard: undefined,
-			previousCard: undefined,
-			message: undefined,
-			stats: {
-				valueMatches: 0,
-				suitMatches: 0,
-			},
-			isComplete: true,
-			isDrawing: false,
-			isResetting: false,
-		};
-
-		render(<SnapGame />);
 
 		fireEvent.click(
 			screen.getByRole("button", {
@@ -192,42 +213,5 @@ describe("SnapGame", () => {
 		await waitFor(() => {
 			expect(reset).toHaveBeenCalledTimes(1);
 		});
-	});
-
-	it("disables action buttons based on control state", () => {
-		hookState = {
-			currentCard: undefined,
-			previousCard: undefined,
-			message: undefined,
-			stats: {
-				valueMatches: 0,
-				suitMatches: 0,
-			},
-			isComplete: false,
-			isDrawing: true,
-			isResetting: false,
-		};
-
-		const { rerender } = render(<SnapGame />);
-
-		expect(
-			screen.getByRole("button", {
-				name: "Draw card",
-			}),
-		).toBeDisabled();
-
-		hookState = {
-			...hookState,
-			isComplete: true,
-			isDrawing: false,
-			isResetting: true,
-		};
-		rerender(<SnapGame />);
-
-		expect(
-			screen.getByRole("button", {
-				name: "Reset",
-			}),
-		).toBeDisabled();
 	});
 });

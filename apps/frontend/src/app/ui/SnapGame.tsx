@@ -1,5 +1,6 @@
 import { Button } from "@use-pico/client/ui/button";
 import { Container } from "@use-pico/client/ui/container";
+import { Status } from "@use-pico/client/ui/status";
 import type { FC } from "react";
 import { useSnapGame } from "../hook/useSnapGame";
 import { SnapCardSlot } from "./SnapCardSlot";
@@ -12,6 +13,7 @@ const toCardAlt = (value: string, suit: string) => {
 
 export const SnapGame: FC = () => {
 	const {
+		hasStarted,
 		currentCard,
 		previousCard,
 		message,
@@ -19,9 +21,40 @@ export const SnapGame: FC = () => {
 		isComplete,
 		isDrawing,
 		isResetting,
+		start,
 		draw,
 		reset,
 	} = useSnapGame();
+
+	if (!hasStarted) {
+		return (
+			<Status
+				icon={"icon-[ph--cards-three-duotone]"}
+				textTitle={"Snap Game!"}
+				textMessage={"Draw through the deck and hunt for snap by value or suit."}
+				ui={{
+					theme: "light",
+					tone: "secondary",
+					round: "lg",
+					inner: "4xl",
+				}}
+				action={
+					<Button
+						disabled={isDrawing}
+						onClick={start}
+						ui={{
+							tone: "primary",
+							theme: "light",
+							size: "lg",
+							text: "xl",
+						}}
+					>
+						Start
+					</Button>
+				}
+			/>
+		);
+	}
 
 	return (
 		<Container
@@ -90,6 +123,8 @@ export const SnapGame: FC = () => {
 					ui={{
 						tone: "secondary",
 						theme: "light",
+						size: "lg",
+						text: "xl",
 					}}
 				>
 					Reset
@@ -99,8 +134,10 @@ export const SnapGame: FC = () => {
 					disabled={isDrawing}
 					onClick={draw}
 					ui={{
-						tone: "secondary",
+						tone: "primary",
 						theme: "light",
+						size: "lg",
+						text: "xl",
 					}}
 				>
 					Draw card

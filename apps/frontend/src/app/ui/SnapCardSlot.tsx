@@ -14,13 +14,6 @@ export const SnapCardSlot: FC<SnapCardSlot.Props> = ({ alt, src, label }) => {
 	return (
 		<Container
 			data-ui={"Card"}
-			ui={{
-				tone: "secondary",
-				theme: "light",
-				background: "default",
-				shadow: true,
-				border: true,
-			}}
 			className={[
 				"aspect-63/88",
 				"w-40",
