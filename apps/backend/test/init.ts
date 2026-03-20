@@ -151,7 +151,6 @@ export default async function globalSetup(): Promise<SetupResult> {
 	);
 
 	return async function teardown() {
-		console.log("TEARDOWN: Starting cleanup...");
 		try {
 			const proc = Bun.spawn([
 				"docker",
@@ -167,7 +166,6 @@ export default async function globalSetup(): Promise<SetupResult> {
 				VOLUME_NAME,
 			]);
 			await volProc.exited;
-			console.log("TEARDOWN: Done");
 		} catch (e) {
 			console.error("TEARDOWN: Failed to remove container:", e);
 		}
