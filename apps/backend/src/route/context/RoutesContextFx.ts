@@ -1,5 +1,6 @@
 import { Context } from "effect";
 import type { withCarHono } from "~/@car/withCarHono";
+import type { withColorHono } from "~/@color/withColorHono";
 import type { withPublicHono } from "~/@public/withPublicHono";
 import type { withHono } from "~/hono/withHono";
 
@@ -16,6 +17,7 @@ export interface RoutesContext {
 	 * Domain specific hono's ("root" routes, usually using different separation).
 	 */
 	carHono: withCarHono;
+	colorHono: withColorHono;
 }
 
 export class RoutesContextFx extends Context.Tag("RoutesContextFx")<

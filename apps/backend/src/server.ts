@@ -4,6 +4,8 @@ import { Effect } from "effect";
 import { CompiledQuery, SqliteDialect } from "kysely";
 import { withCarApiFx } from "~/@car/withCarApiFx";
 import { withCarHono } from "~/@car/withCarHono";
+import { withColorApiFx } from "~/@color/withColorApiFx";
+import { withColorHono } from "~/@color/withColorHono";
 import { withPublicApiFx } from "~/@public/withPublicApiFx";
 import { withPublicHono } from "~/@public/withPublicHono";
 import { withKyselyFx } from "~/database/fx/withKyselyFx";
@@ -37,6 +39,7 @@ const app = await Effect.gen(function* () {
 			new SqliteDialect({
 				database: sqlite,
 				async onCreateConnection(connection) {
+					await connection.executeQuery(CompiledQuery.raw("PRAGMA foreign_keys = ON"));
 					await connection.executeQuery(CompiledQuery.raw("PRAGMA journal_mode = WAL"));
 					await connection.executeQuery(CompiledQuery.raw("PRAGMA busy_timeout = 5000"));
 				},
@@ -52,6 +55,7 @@ const app = await Effect.gen(function* () {
 		 * Register all (root) routes in our app
 		 */
 		withCarApiFx(),
+		withColorApiFx(),
 	]).pipe(withKyselyFx(kyselyContext));
 
 	return root;
@@ -67,6 +71,7 @@ const app = await Effect.gen(function* () {
 		 * also this gives us clear way where we're registering our endpoints without messing up with urls.
 		 */
 		carHono: withCarHono(),
+		colorHono: withColorHono(),
 	}),
 	Effect.runPromise,
 );

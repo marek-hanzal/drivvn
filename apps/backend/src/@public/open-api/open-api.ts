@@ -63,7 +63,7 @@ const extractTagsFromOpenApiDocument = (
 };
 
 export const withOpenApiEndpointFx = Effect.fn("withOpenApiEndpointFx")(function* () {
-	const { root, publicHono, carHono } = yield* RoutesContextFx;
+	const { root, publicHono, carHono, colorHono } = yield* RoutesContextFx;
 
 	const viteConfig = ServerViteSchema.parse(process.env);
 	const apiBase = viteConfig.VITE_SERVER_API.replace(/\/$/, "");
@@ -81,6 +81,10 @@ export const withOpenApiEndpointFx = Effect.fn("withOpenApiEndpointFx")(function
 				{
 					url: `${docsUrl}/car`,
 					title: "Car",
+				},
+				{
+					url: `${docsUrl}/color`,
+					title: "Color",
 				},
 			],
 		}),
@@ -133,6 +137,7 @@ export const withOpenApiEndpointFx = Effect.fn("withOpenApiEndpointFx")(function
 	let cache: null | {
 		public: unknown;
 		car: unknown;
+		color: unknown;
 	} = null;
 
 	const docs = () => {
@@ -159,6 +164,15 @@ export const withOpenApiEndpointFx = Effect.fn("withOpenApiEndpointFx")(function
 				},
 				security: [],
 			}),
+			color: docWithMount("/api/color", colorHono, {
+				openapi: "3.1.0",
+				info: {
+					version: "0.5.0",
+					title: "Color API",
+					description: "Color access and management.",
+				},
+				security: [],
+			}),
 		};
 
 		return cache;
@@ -166,6 +180,7 @@ export const withOpenApiEndpointFx = Effect.fn("withOpenApiEndpointFx")(function
 
 	root.get(`${docsUrl}/public`, (c) => c.json(docs().public));
 	root.get(`${docsUrl}/car`, (c) => c.json(docs().car));
+	root.get(`${docsUrl}/color`, (c) => c.json(docs().color));
 
 	root.doc31(docsUrl, {
 		openapi: "3.1.0",
