@@ -1,5 +1,4 @@
 import { createRoute } from "@hono/zod-openapi";
-import type { ZodErrorFx } from "@use-pico/common/error";
 import { zodGuardFx } from "@use-pico/common/schema";
 import { Effect } from "effect";
 import { carCreateFx } from "~/@car/fx/carCreateFx";
@@ -10,7 +9,6 @@ import { noticeError } from "~/@common/notice/noticeError";
 import { noticeZodError } from "~/@common/notice/noticeZodError";
 import { withKyselyFx } from "~/database/fx/withKyselyFx";
 import { withCatchFx } from "~/effect/withCatchFx";
-import type { RuntimeErrorFx } from "~/error/RuntimeErrorFx";
 import { RoutesContextFx } from "~/route/context/RoutesContextFx";
 import { NoticeSchema } from "~/schema/NoticeSchema";
 
@@ -41,6 +39,14 @@ export const withCreateApiFx = Effect.fn("withCreateApiFx")(function* () {
 						},
 					},
 					description: "The created car",
+				},
+				400: {
+					content: {
+						"application/json": {
+							schema: NoticeSchema,
+						},
+					},
+					description: "Invalid car input",
 				},
 				404: {
 					content: {
@@ -79,10 +85,13 @@ export const withCreateApiFx = Effect.fn("withCreateApiFx")(function* () {
 					NotFoundErrorFx() {
 						return c.json(NotFoundNotice, 404);
 					},
-					ZodErrorFx(error: ZodErrorFx<any>) {
+					InvalidRequestErrorFx(error) {
+						return c.json(noticeError(error), 400);
+					},
+					ZodErrorFx(error) {
 						return c.json(noticeZodError(error.zod), 500);
 					},
-					RuntimeErrorFx(error: RuntimeErrorFx) {
+					RuntimeErrorFx(error) {
 						return c.json(noticeError(error), 500);
 					},
 				}),
