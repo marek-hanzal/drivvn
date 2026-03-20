@@ -16,7 +16,7 @@ export const withFetchApiFx = Effect.fn("withFetchApiFx")(function* () {
 
 	carHono.openapi(
 		createRoute({
-			method: "post",
+			method: "get",
 			path: "/car/{id}",
 			description: "Return a car based on the provided query",
 			operationId: "apiCarFetch",
