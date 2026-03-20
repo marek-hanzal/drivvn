@@ -10,6 +10,11 @@ http://localhost:3031/ (OpenAPI spec), you've to run migration endpoint (from th
 
 The backend expects PostgreSQL to be running first. Without the `postgres` container, the app won't work.
 
+## Tests
+
+Test infrastructure is based on my different project where I'm using isolated databases per test (template database), so I know everything is running
+in fresh environment, this approach also works even on GitHub Actions, so it's CI friendly.
+
 ## Runtime
 
 This app expects `Bun` as a runtime.
