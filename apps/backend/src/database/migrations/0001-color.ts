@@ -1,18 +1,10 @@
 import type { Migration } from "kysely";
 
 const DEFAULT_COLORS = [
-	"Black",
-	"White",
-	"Gray",
-	"Silver",
-	"Red",
-	"Blue",
-	"Green",
-	"Yellow",
-	"Orange",
-	"Brown",
-	"Beige",
-	"Purple",
+	"red",
+	"blue",
+	"white",
+	"black",
 ].map((name) => ({
 	name,
 }));

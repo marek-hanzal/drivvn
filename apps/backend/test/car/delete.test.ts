@@ -15,7 +15,7 @@ describe("car/delete", () => {
 			const builtAt = new Date("2024-01-12T00:00:00.000Z");
 
 			const create = yield* carCreateFx({
-				color: "Black",
+				color: "black",
 				make,
 				model,
 				builtAt,

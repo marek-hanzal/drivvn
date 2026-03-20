@@ -12,7 +12,7 @@ describe("car/patch", () => {
 
 		await Effect.gen(function* () {
 			const create = yield* carCreateFx({
-				color: "Black",
+				color: "black",
 				make: "Patch Make Before",
 				model: "Patch Model Before",
 				builtAt: new Date("2024-01-13T00:00:00.000Z"),
@@ -20,7 +20,7 @@ describe("car/patch", () => {
 
 			const colors = yield* colorCollectionFx({
 				where: {
-					name: "Blue",
+					name: "blue",
 				},
 			});
 
