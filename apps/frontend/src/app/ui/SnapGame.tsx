@@ -18,6 +18,8 @@ export const SnapGame: FC = () => {
 		previousCard,
 		message,
 		stats,
+		progressLabel,
+		nextSnapProbability,
 		isComplete,
 		isDrawing,
 		isResetting,
@@ -67,6 +69,18 @@ export const SnapGame: FC = () => {
 		>
 			<Container
 				ui={{
+					layout: "vertical-centered",
+					gap: "sm",
+				}}
+			>
+				<div>{progressLabel}</div>
+				<div>{`Next snap chance: ${(nextSnapProbability * 100).toFixed(1)}%`}</div>
+				<div>{`Value matches: ${stats.valueMatches}`}</div>
+				<div>{`Suit matches: ${stats.suitMatches}`}</div>
+			</Container>
+
+			<Container
+				ui={{
 					flow: "horizontal",
 					items: "start",
 					gap: "4xl",
@@ -105,16 +119,6 @@ export const SnapGame: FC = () => {
 					className={"h-7"}
 				/>
 			)}
-
-			<Container
-				ui={{
-					layout: "vertical-centered",
-					gap: "sm",
-				}}
-			>
-				<div>{`Value matches: ${stats.valueMatches}`}</div>
-				<div>{`Suit matches: ${stats.suitMatches}`}</div>
-			</Container>
 
 			{isComplete ? (
 				<Button

@@ -15,6 +15,8 @@ let hookState: {
 		valueMatches: number;
 		suitMatches: number;
 	};
+	progressLabel: string;
+	nextSnapProbability: number;
 	isComplete: boolean;
 	isDrawing: boolean;
 	isResetting: boolean;
@@ -61,6 +63,8 @@ describe("SnapGame", () => {
 				valueMatches: 0,
 				suitMatches: 0,
 			},
+			progressLabel: "Card 0 of 52",
+			nextSnapProbability: 0,
 			isComplete: false,
 			isDrawing: false,
 			isResetting: false,
@@ -79,6 +83,7 @@ describe("SnapGame", () => {
 				name: "Start",
 			}),
 		).toBeInTheDocument();
+		expect(screen.queryByText("Card 0 of 52")).not.toBeInTheDocument();
 		expect(screen.queryByText("Value matches: 0")).not.toBeInTheDocument();
 	});
 
@@ -105,6 +110,8 @@ describe("SnapGame", () => {
 		render(<SnapGame />);
 
 		expect(screen.getAllByLabelText("Card placeholder")).toHaveLength(2);
+		expect(screen.getByText("Card 0 of 52")).toBeInTheDocument();
+		expect(screen.getByText("Next snap chance: 0.0%")).toBeInTheDocument();
 		expect(screen.getByText("Value matches: 0")).toBeInTheDocument();
 		expect(screen.getByText("Suit matches: 0")).toBeInTheDocument();
 		expect(
@@ -132,6 +139,8 @@ describe("SnapGame", () => {
 				valueMatches: 1,
 				suitMatches: 4,
 			},
+			progressLabel: "Card 12 of 52",
+			nextSnapProbability: 0.325,
 			isComplete: false,
 			isDrawing: false,
 			isResetting: false,
@@ -148,6 +157,8 @@ describe("SnapGame", () => {
 			}),
 		).toBeInTheDocument();
 		expect(screen.getByText("SNAP SUIT!")).toBeInTheDocument();
+		expect(screen.getByText("Card 12 of 52")).toBeInTheDocument();
+		expect(screen.getByText("Next snap chance: 32.5%")).toBeInTheDocument();
 		expect(screen.getByText("Value matches: 1")).toBeInTheDocument();
 		expect(screen.getByText("Suit matches: 4")).toBeInTheDocument();
 	});
@@ -189,6 +200,8 @@ describe("SnapGame", () => {
 				valueMatches: 9,
 				suitMatches: 4,
 			},
+			progressLabel: "Card 52 of 52",
+			nextSnapProbability: 0,
 			isComplete: true,
 			isDrawing: false,
 			isResetting: false,
@@ -201,6 +214,8 @@ describe("SnapGame", () => {
 				name: "Draw card",
 			}),
 		).not.toBeInTheDocument();
+		expect(screen.getByText("Card 52 of 52")).toBeInTheDocument();
+		expect(screen.getByText("Next snap chance: 0.0%")).toBeInTheDocument();
 		expect(screen.getByText("Value matches: 9")).toBeInTheDocument();
 		expect(screen.getByText("Suit matches: 4")).toBeInTheDocument();
 

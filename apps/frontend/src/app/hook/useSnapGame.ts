@@ -3,6 +3,8 @@ import { withGetShuffledDeckQuery } from "@drivvn/sdk/query/getShuffledDeck";
 import { startTransition, useEffect, useState } from "react";
 import { applyDrawResult } from "../service/snap/applyDrawResult";
 import { createInitialSnapState } from "../service/snap/createInitialSnapState";
+import { getCardProgressLabel } from "../service/snap/getCardProgressLabel";
+import { getNextSnapProbability } from "../service/snap/getNextSnapProbability";
 import { isDeckComplete } from "../service/snap/isDeckComplete";
 
 export const useSnapGame = () => {
@@ -137,6 +139,8 @@ export const useSnapGame = () => {
 			valueMatches: state.valueMatches,
 			suitMatches: state.suitMatches,
 		},
+		progressLabel: getCardProgressLabel(state),
+		nextSnapProbability: getNextSnapProbability(state),
 		isComplete: isDeckComplete(state),
 		isDrawing,
 		isResetting,

@@ -7,11 +7,16 @@ export interface DrawResult {
 	remaining: tRemaining;
 }
 
+export type CountMap = Record<string, number>;
+
 export interface SnapState {
 	currentCard?: tCard;
 	previousCard?: tCard;
 	message?: SnapMessage;
 	valueMatches: number;
 	suitMatches: number;
+	drawnCount: number;
+	drawnValues: CountMap;
+	drawnSuits: CountMap;
 	remaining: number;
 }

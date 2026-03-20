@@ -9,6 +9,9 @@ export const createInitialSnapState = (remaining: tRemaining): SnapState => {
 		message: undefined,
 		valueMatches: 0,
 		suitMatches: 0,
+		drawnCount: 0,
+		drawnValues: {},
+		drawnSuits: {},
 		remaining: normalizeRemaining(remaining),
 	};
 };
