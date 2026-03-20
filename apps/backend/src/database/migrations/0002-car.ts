@@ -17,6 +17,7 @@ export const CarMigration: Migration = {
 
 		await db.schema
 			.createIndex("car_make_model_idx")
+			.unique()
 			.on("car")
 			.columns([
 				"make",
