@@ -1,0 +1,41 @@
+{
+	"name": "@drivvn/frontend",
+	"description": "Frontend task!",
+	"version": "workspace:*",
+	"type": "module",
+	"scripts": {
+		"build": "vite build",
+		"dev": "vite",
+		"preview": "NITRO_PRESET=node_server vite build --mode production && PORT=3030 node .output/server/index.mjs",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@drivvn/sdk": "workspace:*",
+		"@tanstack/react-query": "5.91.2",
+		"@tanstack/react-router": "1.168.1",
+		"@tanstack/react-router-ssr-query": "1.166.10",
+		"@tanstack/react-start": "1.167.1",
+		"luxon": "3.7.2",
+		"react": "19.2.4",
+		"react-dom": "19.2.4",
+		"ts-pattern": "5.9.0",
+		"zod": "4.3.6"
+	},
+	"devDependencies": {
+		"@iconify/json": "2.2.452",
+		"@iconify/tailwind4": "1.2.3",
+		"@tailwindcss/vite": "4.2.2",
+		"@tanstack/router-plugin": "1.167.1",
+		"@types/bun": "1.3.11",
+		"@types/luxon": "3.7.1",
+		"@types/react": "19.2.14",
+		"@types/react-dom": "19.2.3",
+		"@vitejs/plugin-react": "6.0.1",
+		"knip": "6.0.0",
+		"nitro": "3.0.1-alpha.2",
+		"tailwindcss": "4.2.2",
+		"typescript": "beta",
+		"vite": "8.0.0-beta.18"
+	},
+	"private": true
+}

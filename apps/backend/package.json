@@ -1,0 +1,44 @@
+{
+	"name": "@drivvn/backend",
+	"description": "Backend task",
+	"version": "workspace:*",
+	"type": "module",
+	"scripts": {
+		"dev": "run-p dev:*",
+		"dev:nitro": "PORT=3031 nitro dev --host 0.0.0.0",
+		"build": "nitro build && bun ./cli/size.ts",
+		"typecheck": "tsc --noEmit",
+		"test": "bunx --bun vitest --run"
+	},
+	"dependencies": {
+		"@hono/zod-openapi": "1.2.2",
+		"@scalar/hono-api-reference": "0.10.4",
+		"@use-pico/common": "workspace:*",
+		"effect": "3.21.0",
+		"hono": "4.12.8",
+		"kysely": "0.28.14",
+		"luxon": "3.7.2",
+		"minio": "8.0.7",
+		"ts-pattern": "5.9.0",
+		"zod": "4.3.6"
+	},
+	"devDependencies": {
+		"@effect/language-service": "0.81.0",
+		"@types/bun": "1.3.11",
+		"@types/luxon": "3.7.1",
+		"@types/node": "25.5.0",
+		"@types/pg": "8.18.0",
+		"@types/terminal-kit": "2.5.7",
+		"@typescript/native-preview": "7.0.0-dev.20260320.1",
+		"@use-pico/tsconfig": "5.0.0",
+		"knip": "6.0.0",
+		"nitro": "3.0.1-alpha.2",
+		"npm-run-all2": "8.0.4",
+		"rolldown": "1.0.0-rc.10",
+		"typescript": "beta",
+		"vitest": "4.1.0"
+	},
+	"main": "src/index.ts",
+	"types": "src/index.ts",
+	"private": true
+}

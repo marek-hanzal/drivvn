@@ -1,0 +1,29 @@
+{
+	"extends": "@use-pico/tsconfig/common.json",
+	"compilerOptions": {
+		"types": [
+			"@types/bun",
+			"node"
+		],
+		"plugins": [
+			{
+				"name": "@effect/language-service"
+			}
+		],
+		"paths": {
+			"~/*": [
+				"./src/*"
+			],
+			"~test/*": [
+				"./test/*"
+			]
+		}
+	},
+	"include": [
+		"src/**/*",
+		"test/**/*"
+	],
+	"exclude": [
+		"node_modules"
+	]
+}

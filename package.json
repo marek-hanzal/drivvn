@@ -1,0 +1,39 @@
+{
+	"name": "marek-hanzal/drivvn",
+	"description": "The Quest for the Job",
+	"version": "workspace:*",
+	"scripts": {
+		"dev": "dotenv -c development -- turbo run dev --parallel",
+		"build": "dotenv -c development -- turbo run build --parallel",
+		"preview": "dotenv -c development -- turbo run preview --parallel",
+		"sdk": "dotenv -c development -- bun x turbo run sdk",
+		"format": "biome format --write .",
+		"lint": "biome check --write .",
+		"update": "bun update",
+		"typecheck": "turbo run typecheck --parallel",
+		"test": "dotenv -c development -- turbo run test --parallel",
+		"sp:fix": "bunx syncpack fix",
+		"sp:format": "bunx syncpack format",
+		"sp:update": "bunx syncpack update",
+		"workflow:format": "run-s sp:format format",
+		"workflow:check": "run-s workflow:format lint typecheck",
+		"workflow:update": "run-s sp:fix sp:update sp:fix sp:update workflow:format update workflow:check"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.8",
+		"@types/node": "25.5.0",
+		"dotenv-cli": "11.0.0",
+		"npm-run-all2": "8.0.4",
+		"syncpack": "14.2.0",
+		"turbo": "2.8.20",
+		"typescript": "beta"
+	},
+	"license": "MIT",
+	"repository": "marek-hanzal/drivvn.git",
+	"packageManager": "bun@1.3.0",
+	"private": true,
+	"workspaces": [
+		"apps/*",
+		"packages/**/*"
+	]
+}

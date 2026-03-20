@@ -1,0 +1,150 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"command": "bun run dev",
+			"problemMatcher": [],
+			"label": "dev",
+			"detail": "Starts a development server of the client.",
+			"runOptions": {
+				"instanceLimit": 1
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": true
+			}
+		},
+		{
+			"type": "shell",
+			"command": "bun run build",
+			"problemMatcher": [],
+			"label": "build",
+			"detail": "Build the project.",
+			"runOptions": {
+				"instanceLimit": 1
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": true
+			}
+		},
+		{
+			"label": "sdk",
+			"type": "shell",
+			"command": "bun run sdk",
+			"problemMatcher": [],
+			"detail": "Generate or update the SDK using bun run sdk.",
+			"runOptions": {
+				"instanceLimit": 1
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": true
+			}
+		},
+		{
+			"type": "shell",
+			"command": "bun run workflow:check",
+			"problemMatcher": [],
+			"label": "check",
+			"detail": "Run lint and typecheck.",
+			"runOptions": {
+				"instanceLimit": 1
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": true
+			}
+		},
+		{
+			"type": "shell",
+			"command": "bun run workflow:update",
+			"problemMatcher": [],
+			"label": "update",
+			"detail": "Update dependencies and format.",
+			"runOptions": {
+				"instanceLimit": 1
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": true
+			}
+		},
+		{
+			"type": "shell",
+			"command": "bun run format",
+			"problemMatcher": [],
+			"label": "format",
+			"detail": "Format the code.",
+			"runOptions": {
+				"instanceLimit": 1
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": true,
+				"close": true
+			}
+		},
+		{
+			"type": "shell",
+			"command": "bun run preview",
+			"problemMatcher": [],
+			"label": "preview",
+			"detail": "Start production preview.",
+			"runOptions": {
+				"instanceLimit": 1
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": true
+			}
+		},
+		{
+			"type": "shell",
+			"command": "bun run test",
+			"problemMatcher": [],
+			"label": "test",
+			"detail": "Run tests.",
+			"runOptions": {
+				"instanceLimit": 1
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": true
+			}
+		}
+	]
+}
