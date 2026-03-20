@@ -1,9 +1,45 @@
-import type { tCard } from "@drivvn/sdk/api/client";
+import type { tCard, tDeckResponse, tDrawCardsExistingDeckResponse } from "@drivvn/sdk/api/client";
+import type { tSuccessResponse } from "@drivvn/sdk/mutation/_shared";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { applyDrawResult } from "../src/app/service/snap/applyDrawResult";
 import { createInitialSnapState } from "../src/app/service/snap/createInitialSnapState";
 import { SnapGame } from "../src/app/ui/SnapGame";
+
+let currentDeck: tSuccessResponse<tDeckResponse>;
+let invalidateDeck = vi.fn(async () => {});
+let refetchDeck = vi.fn(async () => ({
+	data: currentDeck,
+}));
+let drawCard =
+	vi.fn<
+		(args: {
+			path: {
+				deck_id: string;
+			};
+			query: {
+				count: number;
+			};
+		}) => Promise<tSuccessResponse<tDrawCardsExistingDeckResponse[200]>>
+	>();
+
+vi.mock("@drivvn/sdk/query/getShuffledDeck", () => ({
+	withGetShuffledDeckQuery: {
+		useSuspenseQuery: () => ({
+			data: currentDeck,
+			refetch: refetchDeck,
+		}),
+		useInvalidate: () => invalidateDeck,
+	},
+}));
+
+vi.mock("@drivvn/sdk/mutation/drawCardsExistingDeck", () => ({
+	withDrawCardsExistingDeckMutation: {
+		useMutation: () => ({
+			mutateAsync: drawCard,
+		}),
+	},
+}));
 
 const createCard = ({
 	code,
@@ -27,24 +63,35 @@ const createCard = ({
 };
 
 describe("SnapGame", () => {
+	beforeEach(() => {
+		currentDeck = {
+			success: true,
+			deck_id: "deck-1",
+			shuffled: true,
+			remaining: 52,
+		};
+		invalidateDeck = vi.fn(async () => {});
+		refetchDeck = vi.fn(async () => ({
+			data: currentDeck,
+		}));
+		drawCard = vi.fn();
+	});
+
 	it("shows the drawn card and keeps a placeholder when there is no previous card", async () => {
-		const onDrawCard = vi.fn().mockResolvedValue({
-			card: createCard({
-				code: "AS",
-				value: "ACE",
-				suit: "SPADES",
-			}),
+		drawCard.mockResolvedValue({
+			success: true,
+			deck_id: "deck-1",
+			cards: [
+				createCard({
+					code: "AS",
+					value: "ACE",
+					suit: "SPADES",
+				}),
+			],
 			remaining: 51,
 		});
 
-		render(
-			<SnapGame
-				deckId={"deck-1"}
-				initialRemaining={52}
-				onDrawCard={onDrawCard}
-				onReset={vi.fn()}
-			/>,
-		);
+		render(<SnapGame />);
 
 		fireEvent.click(
 			screen.getByRole("button", {
@@ -79,24 +126,24 @@ describe("SnapGame", () => {
 				remaining: 50,
 			},
 		];
-		const onDrawCard = vi.fn().mockImplementation(async () => {
+		drawCard.mockImplementation(async () => {
 			const next = draws.shift();
 
 			if (!next) {
 				throw new Error("Missing mocked draw.");
 			}
 
-			return next;
+			return {
+				success: true,
+				deck_id: "deck-1",
+				cards: [
+					next.card,
+				],
+				remaining: next.remaining,
+			};
 		});
 
-		render(
-			<SnapGame
-				deckId={"deck-1"}
-				initialRemaining={52}
-				onDrawCard={onDrawCard}
-				onReset={vi.fn()}
-			/>,
-		);
+		render(<SnapGame />);
 
 		fireEvent.click(
 			screen.getByRole("button", {
@@ -134,24 +181,24 @@ describe("SnapGame", () => {
 				remaining: 50,
 			},
 		];
-		const onDrawCard = vi.fn().mockImplementation(async () => {
+		drawCard.mockImplementation(async () => {
 			const next = draws.shift();
 
 			if (!next) {
 				throw new Error("Missing mocked draw.");
 			}
 
-			return next;
+			return {
+				success: true,
+				deck_id: "deck-1",
+				cards: [
+					next.card,
+				],
+				remaining: next.remaining,
+			};
 		});
 
-		render(
-			<SnapGame
-				deckId={"deck-1"}
-				initialRemaining={52}
-				onDrawCard={onDrawCard}
-				onReset={vi.fn()}
-			/>,
-		);
+		render(<SnapGame />);
 
 		fireEvent.click(
 			screen.getByRole("button", {
@@ -189,24 +236,24 @@ describe("SnapGame", () => {
 				remaining: 50,
 			},
 		];
-		const onDrawCard = vi.fn().mockImplementation(async () => {
+		drawCard.mockImplementation(async () => {
 			const next = draws.shift();
 
 			if (!next) {
 				throw new Error("Missing mocked draw.");
 			}
 
-			return next;
+			return {
+				success: true,
+				deck_id: "deck-1",
+				cards: [
+					next.card,
+				],
+				remaining: next.remaining,
+			};
 		});
 
-		render(
-			<SnapGame
-				deckId={"deck-1"}
-				initialRemaining={52}
-				onDrawCard={onDrawCard}
-				onReset={vi.fn()}
-			/>,
-		);
+		render(<SnapGame />);
 
 		fireEvent.click(
 			screen.getByRole("button", {
@@ -261,24 +308,24 @@ describe("SnapGame", () => {
 			(state, draw) => applyDrawResult(state, draw),
 			createInitialSnapState(52),
 		);
-		const onDrawCard = vi.fn().mockImplementation(async () => {
+		drawCard.mockImplementation(async () => {
 			const next = drawResults.shift();
 
 			if (!next) {
 				throw new Error("Missing mocked draw.");
 			}
 
-			return next;
+			return {
+				success: true,
+				deck_id: "deck-1",
+				cards: [
+					next.card,
+				],
+				remaining: next.remaining,
+			};
 		});
 
-		render(
-			<SnapGame
-				deckId={"deck-1"}
-				initialRemaining={52}
-				onDrawCard={onDrawCard}
-				onReset={vi.fn()}
-			/>,
-		);
+		render(<SnapGame />);
 
 		for (let index = 0; index < 52; index++) {
 			fireEvent.click(
@@ -287,7 +334,7 @@ describe("SnapGame", () => {
 				}),
 			);
 			await waitFor(() => {
-				expect(onDrawCard).toHaveBeenCalledTimes(index + 1);
+				expect(drawCard).toHaveBeenCalledTimes(index + 1);
 			});
 		}
 
@@ -310,24 +357,28 @@ describe("SnapGame", () => {
 	});
 
 	it("resets the game when reset is clicked after the deck is complete", async () => {
-		const onDrawCard = vi.fn().mockResolvedValue({
-			card: createCard({
-				code: "AS",
-				value: "ACE",
-				suit: "SPADES",
-			}),
+		drawCard.mockResolvedValue({
+			success: true,
+			deck_id: "deck-1",
+			cards: [
+				createCard({
+					code: "AS",
+					value: "ACE",
+					suit: "SPADES",
+				}),
+			],
 			remaining: 0,
 		});
-		const onReset = vi.fn().mockResolvedValue(undefined);
+		invalidateDeck = vi.fn(async () => {
+			currentDeck = {
+				success: true,
+				deck_id: "deck-2",
+				shuffled: true,
+				remaining: 52,
+			};
+		});
 
-		render(
-			<SnapGame
-				deckId={"deck-1"}
-				initialRemaining={52}
-				onDrawCard={onDrawCard}
-				onReset={onReset}
-			/>,
-		);
+		render(<SnapGame />);
 
 		fireEvent.click(
 			screen.getByRole("button", {
@@ -345,7 +396,8 @@ describe("SnapGame", () => {
 		);
 
 		await waitFor(() => {
-			expect(onReset).toHaveBeenCalledTimes(1);
+			expect(invalidateDeck).toHaveBeenCalledTimes(1);
+			expect(refetchDeck).toHaveBeenCalledTimes(1);
 		});
 	});
 });
