@@ -16,7 +16,7 @@ export const withCarSourceSelectFx = Effect.fn("withCarSourceSelectFx")(function
 }: withCarSourceSelectFx.Props) {
 	const { kysely } = yield* KyselyContextFx;
 
-	let query = kysely.selectFrom("car as c");
+	let query = kysely.selectFrom("car as c").innerJoin("color as clr", "clr.id", "c.colorId");
 
 	for (const item of sort ?? []) {
 		query = match(item.field)
