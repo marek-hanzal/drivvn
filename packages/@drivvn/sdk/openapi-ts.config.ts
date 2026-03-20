@@ -2,7 +2,10 @@ import { defineConfig } from "@hey-api/openapi-ts";
 
 const output = {
 	path: "src/api/client",
-	postProcess: ["biome:lint", "biome:format"],
+	postProcess: [
+		"biome:lint",
+		"biome:format",
+	],
 } as const;
 
 export default defineConfig({
@@ -53,8 +56,6 @@ export default defineConfig({
 		},
 		{
 			name: "@hey-api/typescript",
-			validator: true,
-			baseUrl: false,
 			case: "camelCase",
 			requests: {
 				name: "t{{name}}Request",
