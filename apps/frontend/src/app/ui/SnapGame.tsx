@@ -24,6 +24,7 @@ export const SnapGame: FC = () => {
 		start,
 		draw,
 		reset,
+		startFresh,
 	} = useSnapGame();
 
 	if (phase === "idle" || phase === "starting") {
@@ -56,7 +57,7 @@ export const SnapGame: FC = () => {
 		);
 	}
 
-	if (phase === "completed" || phase === "resetting") {
+	if (phase === "completed" || phase === "resetting" || phase === "refreshing") {
 		return (
 			<Status
 				icon={"icon-[ph--seal-warning-duotone]"}
@@ -69,18 +70,38 @@ export const SnapGame: FC = () => {
 					inner: "4xl",
 				}}
 				action={
-					<Button
-						disabled={phase === "resetting"}
-						onClick={reset}
+					<Container
 						ui={{
-							tone: "secondary",
-							theme: "light",
-							size: "lg",
-							text: "xl",
+							flow: "horizontal",
+							gap: "md",
 						}}
 					>
-						Reset game
-					</Button>
+						<Button
+							disabled={phase === "resetting" || phase === "refreshing"}
+							onClick={reset}
+							ui={{
+								tone: "secondary",
+								theme: "light",
+								size: "lg",
+								text: "xl",
+							}}
+						>
+							Reset game
+						</Button>
+
+						<Button
+							disabled={phase === "resetting" || phase === "refreshing"}
+							onClick={startFresh}
+							ui={{
+								tone: "neutral",
+								theme: "light",
+								size: "lg",
+								text: "xl",
+							}}
+						>
+							Start fresh
+						</Button>
+					</Container>
 				}
 			/>
 		);
@@ -124,7 +145,6 @@ export const SnapGame: FC = () => {
 							? toCardAlt(previousCard.value, previousCard.suit)
 							: PLACEHOLDER_ALT
 					}
-					label={"Previous"}
 					src={previousCard?.image}
 				/>
 
@@ -134,7 +154,6 @@ export const SnapGame: FC = () => {
 							? toCardAlt(currentCard.value, currentCard.suit)
 							: PLACEHOLDER_ALT
 					}
-					label={"Current"}
 					src={currentCard?.image}
 				/>
 			</Container>

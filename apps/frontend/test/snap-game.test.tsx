@@ -7,6 +7,7 @@ import { SnapGame } from "../src/app/ui/SnapGame";
 let start = vi.fn(async () => {});
 let draw = vi.fn(async () => {});
 let reset = vi.fn(async () => {});
+let startFresh = vi.fn(async () => {});
 let hookState: {
 	phase: SnapGamePhase;
 	currentCard?: tCard;
@@ -27,6 +28,7 @@ vi.mock("../src/app/hook/useSnapGame", () => ({
 		start,
 		draw,
 		reset,
+		startFresh,
 	}),
 }));
 
@@ -69,6 +71,7 @@ describe("SnapGame", () => {
 		start = vi.fn(async () => {});
 		draw = vi.fn(async () => {});
 		reset = vi.fn(async () => {});
+		startFresh = vi.fn(async () => {});
 	});
 
 	it("shows intro status before the game starts", () => {
@@ -221,6 +224,11 @@ describe("SnapGame", () => {
 		expect(screen.queryByText("Card 52 of 52")).not.toBeInTheDocument();
 		expect(screen.queryByText("Next snap chance: 0.0%")).not.toBeInTheDocument();
 		expect(screen.getByText("Value matches: 9 | Suit matches: 4")).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", {
+				name: "Start fresh",
+			}),
+		).toBeInTheDocument();
 
 		fireEvent.click(
 			screen.getByRole("button", {
@@ -230,6 +238,25 @@ describe("SnapGame", () => {
 
 		await waitFor(() => {
 			expect(reset).toHaveBeenCalledTimes(1);
+		});
+	});
+
+	it("calls start fresh through the control hook", async () => {
+		hookState = {
+			...hookState,
+			phase: "completed",
+		};
+
+		render(<SnapGame />);
+
+		fireEvent.click(
+			screen.getByRole("button", {
+				name: "Start fresh",
+			}),
+		);
+
+		await waitFor(() => {
+			expect(startFresh).toHaveBeenCalledTimes(1);
 		});
 	});
 });

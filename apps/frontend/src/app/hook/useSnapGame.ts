@@ -7,7 +7,14 @@ import { createInitialSnapState } from "../service/snap/createInitialSnapState";
 import { getNextSnapProbability } from "../service/snap/getNextSnapProbability";
 
 export namespace useSnapGame {
-	export type Phase = "idle" | "starting" | "ready" | "drawing" | "resetting" | "completed";
+	export type Phase =
+		| "idle"
+		| "starting"
+		| "ready"
+		| "drawing"
+		| "resetting"
+		| "refreshing"
+		| "completed";
 }
 
 export type SnapGamePhase = useSnapGame.Phase;
@@ -42,7 +49,9 @@ export const useSnapGame = () => {
 				deckConfig: snapDeckConfig,
 			}),
 		);
-		setPhase("idle");
+		setPhase((current) =>
+			current === "resetting" || current === "refreshing" ? current : "idle",
+		);
 	}, [
 		deck.deck_id,
 	]);
@@ -169,6 +178,30 @@ export const useSnapGame = () => {
 		invalidateDeck,
 	]);
 
+	/**
+	 * Start fresh by loading a new shuffled deck and returning to the intro state.
+	 */
+	const startFresh = useCallback(async () => {
+		setPhase("refreshing");
+
+		try {
+			await invalidateDeck();
+			const nextDeck = await deckQuery.refetch();
+
+			if (!nextDeck.data) {
+				throw new Error("Shuffled deck query returned no deck.");
+			}
+
+			setPhase("idle");
+		} catch (error) {
+			setPhase("completed");
+			throw error;
+		}
+	}, [
+		deckQuery,
+		invalidateDeck,
+	]);
+
 	return {
 		phase,
 		currentCard: state.currentCard,
@@ -186,5 +219,6 @@ export const useSnapGame = () => {
 		start,
 		draw,
 		reset,
+		startFresh,
 	} as const;
 };
