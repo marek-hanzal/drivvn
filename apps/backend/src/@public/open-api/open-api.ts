@@ -155,7 +155,7 @@ export const withOpenApiEndpointFx = Effect.fn("withOpenApiEndpointFx")(function
 				},
 				security: [],
 			}),
-			car: docWithMount("/api/car", carHono, {
+			car: docWithMount("/", carHono, {
 				openapi: "3.1.0",
 				info: {
 					version: "0.5.0",

@@ -1,6 +1,6 @@
 import { createRoute } from "@hono/zod-openapi";
 import type { NotFoundErrorFx, ZodErrorFx } from "@use-pico/common/error";
-import { zodGuardFx } from "@use-pico/common/schema";
+import { EntitySchema, zodGuardFx } from "@use-pico/common/schema";
 import { Effect } from "effect";
 import { carPatchFx } from "~/@car/fx/carPatchFx";
 import { CarPatchSchema } from "~/@car/schema/CarPatchSchema";
@@ -20,14 +20,15 @@ export const withPatchApiFx = Effect.fn("withPatchApiFx")(function* () {
 	carHono.openapi(
 		createRoute({
 			method: "patch",
-			path: "/patch",
+			path: "/cars/{id}",
 			description: "Update an existing car",
 			operationId: "apiCarPatch",
 			request: {
+				params: EntitySchema,
 				body: {
 					content: {
 						"application/json": {
-							schema: CarPatchSchema,
+							schema: CarPatchSchema.shape.patch,
 						},
 					},
 					description: "Data for updating a car",
@@ -65,11 +66,25 @@ export const withPatchApiFx = Effect.fn("withPatchApiFx")(function* () {
 			summary: "Update an existing car",
 		}),
 		async (c) => {
+			const { id } = c.req.valid("param");
+
 			return Effect.gen(function* () {
 				return c.json(
 					yield* zodGuardFx({
 						schema: CarSchema,
-						dataFx: carPatchFx(c.req.valid("json")),
+						dataFx: carPatchFx({
+							/**
+							 * Just to keep the inconsistent API somewhat consistent:
+							 *
+							 * This request should be as whole from the body.
+							 */
+							patch: c.req.valid("json"),
+							query: {
+								where: {
+									id,
+								},
+							},
+						}),
 					}),
 					200,
 				);
