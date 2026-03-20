@@ -10,8 +10,8 @@ import { SnapCardSlot } from "./SnapCardSlot";
 const PLACEHOLDER_ALT = "Card placeholder";
 const cardTransition = {
 	type: "spring",
-	stiffness: 360,
-	damping: 30,
+	stiffness: 320,
+	damping: 24,
 	mass: 0.9,
 } as const;
 
@@ -158,17 +158,20 @@ export const SnapGame: FC = () => {
 									key={previousCard.code}
 									animate={{
 										opacity: 1,
+										rotate: 0,
 										scale: 1,
 										x: 0,
 										y: 0,
 									}}
 									exit={{
 										opacity: 0,
+										rotate: -4,
 										scale: 0.96,
 										x: -36,
 									}}
 									initial={{
 										opacity: 0,
+										rotate: -6,
 										scale: 0.96,
 										x: -24,
 										y: 0,
@@ -193,6 +196,7 @@ export const SnapGame: FC = () => {
 									key={"previous-placeholder"}
 									animate={{
 										opacity: 1,
+										rotate: 0,
 										scale: 1,
 										y: 0,
 									}}
@@ -202,6 +206,7 @@ export const SnapGame: FC = () => {
 									}}
 									initial={{
 										opacity: 0,
+										rotate: -2,
 										scale: 0.98,
 										y: 0,
 									}}

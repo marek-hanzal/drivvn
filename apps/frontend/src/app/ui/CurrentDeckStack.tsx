@@ -30,8 +30,8 @@ export namespace CurrentDeckStack {
 
 const cardTransition = {
 	type: "spring",
-	stiffness: 360,
-	damping: 30,
+	stiffness: 320,
+	damping: 24,
 	mass: 0.9,
 } as const;
 
@@ -107,17 +107,20 @@ export const CurrentDeckStack: FC<CurrentDeckStack.Props> = ({
 					key={cardKey ?? src ?? "card-placeholder"}
 					animate={{
 						opacity: 1,
+						rotate: 0,
 						scale: 1,
 						x: 0,
 						y: 0,
 					}}
 					exit={{
 						opacity: 0,
+						rotate: 4,
 						scale: 0.96,
 						x: -36,
 					}}
 					initial={{
 						opacity: 0,
+						rotate: 6,
 						scale: 0.96,
 						x: 36,
 						y: 0,
