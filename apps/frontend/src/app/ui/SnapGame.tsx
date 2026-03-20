@@ -3,7 +3,11 @@ import { Container } from "@use-pico/client/ui/container";
 import { Status } from "@use-pico/client/ui/status";
 import type { FC } from "react";
 import { useSnapGame } from "../hook/useSnapGame";
-import { CurrentDeckStack } from "./CurrentDeckStack";
+import {
+	CurrentDeckStack,
+	SNAP_CARD_HEIGHT_REM,
+	SNAP_STACK_OFFSET_REM,
+} from "./CurrentDeckStack";
 import { SnapCardSlot } from "./SnapCardSlot";
 
 const PLACEHOLDER_ALT = "Card placeholder";
@@ -122,35 +126,46 @@ export const SnapGame: FC = () => {
 		>
 			<Container
 				ui={{
-					layout: "vertical-centered",
-					gap: "sm",
-				}}
-			>
-				<div>{`Card ${drawnCount} of ${totalCards}`}</div>
-				<div>{`Next snap chance: ${(nextSnapProbability * 100).toFixed(1)}%`}</div>
-				<div>{`Value matches: ${stats.valueMatches}`}</div>
-				<div>{`Suit matches: ${stats.suitMatches}`}</div>
-			</Container>
-
-			<Container
-				ui={{
 					flow: "horizontal",
-					items: "start",
+					items: "center",
 					gap: "4xl",
 				}}
 				className={[
 					"w-fit",
 					"max-w-full",
 				]}
+				style={{
+					minHeight: `${SNAP_CARD_HEIGHT_REM + SNAP_STACK_OFFSET_REM}rem`,
+				}}
 			>
-				<SnapCardSlot
-					alt={
-						previousCard
-							? toCardAlt(previousCard.value, previousCard.suit)
-							: PLACEHOLDER_ALT
-					}
-					src={previousCard?.image}
-				/>
+				<Container
+					className={[
+						"relative",
+						"w-40",
+						"shrink-0",
+					]}
+					style={{
+						height: `${SNAP_CARD_HEIGHT_REM + SNAP_STACK_OFFSET_REM}rem`,
+					}}
+				>
+					<Container
+						style={{
+							position: "absolute",
+							left: 0,
+							top: `${SNAP_STACK_OFFSET_REM}rem`,
+							width: "10rem",
+						}}
+					>
+						<SnapCardSlot
+							alt={
+								previousCard
+									? toCardAlt(previousCard.value, previousCard.suit)
+									: PLACEHOLDER_ALT
+							}
+							src={previousCard?.image}
+						/>
+					</Container>
+				</Container>
 
 				<CurrentDeckStack
 					alt={
@@ -161,6 +176,22 @@ export const SnapGame: FC = () => {
 					src={currentCard?.image}
 					remainingCount={remainingCount}
 				/>
+
+				<Container
+					ui={{
+						layout: "vertical-centered",
+						gap: "sm",
+					}}
+					className={[
+						"w-80",
+						"text-center",
+					]}
+				>
+					<div>{`Card ${drawnCount} of ${totalCards}`}</div>
+					<div>{`Next snap chance: ${(nextSnapProbability * 100).toFixed(1)}%`}</div>
+					<div>{`Value matches: ${stats.valueMatches}`}</div>
+					<div>{`Suit matches: ${stats.suitMatches}`}</div>
+				</Container>
 			</Container>
 
 			{message ? (

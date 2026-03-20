@@ -5,9 +5,10 @@ import { SnapCardSlot } from "./SnapCardSlot";
 
 const CARD_BACK_SRC = "https://deckofcardsapi.com/static/img/back.png";
 const MAX_VISIBLE_CARDS = 5;
-const CARD_WIDTH_REM = 10;
-const CARD_HEIGHT_REM = (CARD_WIDTH_REM * 88) / 63;
+export const SNAP_CARD_WIDTH_REM = 10;
+export const SNAP_CARD_HEIGHT_REM = (SNAP_CARD_WIDTH_REM * 88) / 63;
 const STACK_STEP_REM = 1.5;
+export const SNAP_STACK_OFFSET_REM = MAX_VISIBLE_CARDS * STACK_STEP_REM;
 const STACK_LAYERS = [
 	0,
 	1,
@@ -26,7 +27,7 @@ export namespace CurrentDeckStack {
 
 export const CurrentDeckStack: FC<CurrentDeckStack.Props> = ({ alt, src, remainingCount }) => {
 	const visibleCount = Math.min(remainingCount, MAX_VISIBLE_CARDS);
-	const stackDepthRem = visibleCount > 0 ? visibleCount * STACK_STEP_REM : 0;
+	const stackStartRem = SNAP_STACK_OFFSET_REM - visibleCount * STACK_STEP_REM;
 
 	return (
 		<Container
@@ -36,17 +37,16 @@ export const CurrentDeckStack: FC<CurrentDeckStack.Props> = ({ alt, src, remaini
 				"shrink-0",
 			]}
 			style={{
-				height: `${CARD_HEIGHT_REM}rem`,
-				overflow: "visible",
+				height: `${SNAP_CARD_HEIGHT_REM + SNAP_STACK_OFFSET_REM}rem`,
 			}}
 		>
 			{STACK_LAYERS.slice(0, visibleCount).map((layer) => {
 				const style: CSSProperties = {
 					position: "absolute",
 					left: 0,
-					top: `${-stackDepthRem + layer * STACK_STEP_REM}rem`,
-					width: `${CARD_WIDTH_REM}rem`,
-					height: `${CARD_HEIGHT_REM}rem`,
+					top: `${stackStartRem + layer * STACK_STEP_REM}rem`,
+					width: `${SNAP_CARD_WIDTH_REM}rem`,
+					height: `${SNAP_CARD_HEIGHT_REM}rem`,
 					zIndex: layer + 1,
 				};
 
@@ -72,8 +72,8 @@ export const CurrentDeckStack: FC<CurrentDeckStack.Props> = ({ alt, src, remaini
 				style={{
 					position: "absolute",
 					left: 0,
-					top: 0,
-					width: `${CARD_WIDTH_REM}rem`,
+					top: `${SNAP_STACK_OFFSET_REM}rem`,
+					width: `${SNAP_CARD_WIDTH_REM}rem`,
 					zIndex: MAX_VISIBLE_CARDS + 1,
 				}}
 			>
