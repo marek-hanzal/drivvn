@@ -8,7 +8,7 @@ describe("car/collection", () => {
 		Effect.gen(function* () {
 			const make = "Collection Make";
 			const model = "Collection Model";
-			const builtAt = new Date("2024-01-10T00:00:00.000Z");
+			const builtAt = "2024-01-10T00:00:00.000Z";
 
 			const create = yield* carCreateFx({
 				color: "Black",

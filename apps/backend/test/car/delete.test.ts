@@ -9,7 +9,7 @@ describe("car/delete", () => {
 		Effect.gen(function* () {
 			const make = "Delete Make";
 			const model = "Delete Model";
-			const builtAt = new Date("2024-01-12T00:00:00.000Z");
+			const builtAt = "2024-01-12T00:00:00.000Z";
 
 			const create = yield* carCreateFx({
 				color: "Black",

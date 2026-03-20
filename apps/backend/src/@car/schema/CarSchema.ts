@@ -5,20 +5,17 @@ import { CarTableSchema } from "~/database/@table/CarTableSchema";
 export const CarSchema = z
 	.looseObject({
 		...CarTableSchema.shape,
-		color: z.preprocess(
-			(value) => {
-				if (typeof value !== "string") {
-					return value;
-				}
+		color: z.preprocess((value) => {
+			if (typeof value !== "string") {
+				return value;
+			}
 
-				try {
-					return JSON.parse(value);
-				} catch {
-					return value;
-				}
-			},
-			ColorSchema,
-		),
+			try {
+				return JSON.parse(value);
+			} catch {
+				return value;
+			}
+		}, ColorSchema),
 	})
 	.strip()
 	.openapi("Car", {

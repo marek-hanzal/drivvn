@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { DateTime } from "luxon";
 import { carFetchFx } from "~/@car/fx/carFetchFx";
 import type { CarPatchSchema } from "~/@car/schema/CarPatchSchema";
 import { KyselyContextFx } from "~/database/context/KyselyContextFx";
@@ -16,7 +17,17 @@ export const carPatchFx = Effect.fn("carPatchFx")(function* ({ patch, query }: c
 			const car = yield* carFetchFx(query);
 
 			yield* tryDbFx(async () =>
-				kysely.updateTable("car").set(patch).where("id", "=", car.id).executeTakeFirst(),
+				kysely
+					.updateTable("car")
+					.set({
+						...patch,
+						builtAt: patch.builtAt
+							? (DateTime.fromISO(patch.builtAt).toSQLDate() ??
+								DateTime.now().toSQL())
+							: undefined,
+					})
+					.where("id", "=", car.id)
+					.executeTakeFirst(),
 			);
 
 			return yield* carFetchFx({

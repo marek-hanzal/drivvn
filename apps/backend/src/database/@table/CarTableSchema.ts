@@ -12,7 +12,7 @@ export const CarTableSchema = z
 		model: z.string().min(1).openapi({
 			description: "How cool the car is in the make's roaster",
 		}),
-		builtAt: z.coerce.date().openapi({
+		builtAt: z.string().openapi({
 			description: "Whe the car has been built",
 			type: "string",
 		}),

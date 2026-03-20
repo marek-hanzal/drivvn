@@ -17,7 +17,7 @@ export const colorDeleteFx = Effect.fn("colorDeleteFx")(function* (query: colorD
 			const color = yield* colorFetchFx(query);
 
 			yield* tryDbFx(async () =>
-				kysely.deleteFrom("color").where("id", "=", color.id).execute()
+				kysely.deleteFrom("color").where("id", "=", color.id).execute(),
 			);
 
 			return color;

@@ -12,7 +12,7 @@ describe("car/patch", () => {
 				color: "Black",
 				make: "Patch Make Before",
 				model: "Patch Model Before",
-				builtAt: new Date("2024-01-13T00:00:00.000Z"),
+				builtAt: "2024-01-13T00:00:00.000Z",
 			});
 
 			const colors = yield* colorCollectionFx({
@@ -21,9 +21,13 @@ describe("car/patch", () => {
 				},
 			});
 
-			const blue = colors[0]!;
+			const [blue] = colors;
 
 			expect(blue).toBeDefined();
+
+			if (!blue) {
+				throw Error("We already handled this, but TS is crying about the type of `blue`");
+			}
 
 			const patch = yield* carPatchFx({
 				query: {
@@ -35,7 +39,7 @@ describe("car/patch", () => {
 					colorId: blue.id,
 					make: "Patch Make After",
 					model: "Patch Model After",
-					builtAt: new Date("2024-02-14T00:00:00.000Z"),
+					builtAt: "2024-02-14T00:00:00.000Z",
 				},
 			});
 

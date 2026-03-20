@@ -19,7 +19,11 @@ export const colorPatchFx = Effect.fn("colorPatchFx")(function* ({
 			const color = yield* colorFetchFx(query);
 
 			yield* tryDbFx(async () =>
-				kysely.updateTable("color").set(patch).where("id", "=", color.id).executeTakeFirst(),
+				kysely
+					.updateTable("color")
+					.set(patch)
+					.where("id", "=", color.id)
+					.executeTakeFirst(),
 			);
 
 			return yield* colorFetchFx({
