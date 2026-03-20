@@ -19,7 +19,6 @@ let hookState: {
 		suitMatches: number;
 	};
 	nextSnapProbability: number;
-	isComplete: boolean;
 };
 
 vi.mock("../src/app/hook/useSnapGame", () => ({
@@ -66,7 +65,6 @@ describe("SnapGame", () => {
 				suitMatches: 0,
 			},
 			nextSnapProbability: 0,
-			isComplete: false,
 		};
 		start = vi.fn(async () => {});
 		draw = vi.fn(async () => {});
@@ -141,7 +139,6 @@ describe("SnapGame", () => {
 			totalCards: 52,
 			drawnCount: 12,
 			nextSnapProbability: 0.325,
-			isComplete: false,
 		};
 
 		render(<SnapGame />);
@@ -180,9 +177,9 @@ describe("SnapGame", () => {
 		});
 	});
 
-	it("shows reset instead of draw when the game is complete and calls reset", async () => {
+	it("shows game over status without cards and calls reset", async () => {
 		hookState = {
-			phase: "ready",
+			phase: "completed",
 			currentCard: createCard({
 				code: "AS",
 				value: "ACE",
@@ -201,24 +198,33 @@ describe("SnapGame", () => {
 			totalCards: 52,
 			drawnCount: 52,
 			nextSnapProbability: 0,
-			isComplete: true,
 		};
 
 		render(<SnapGame />);
 
+		expect(screen.getByText("Game over")).toBeInTheDocument();
+		expect(
+			screen.queryByRole("img", {
+				name: "ace of spades",
+			}),
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole("img", {
+				name: "ace of hearts",
+			}),
+		).not.toBeInTheDocument();
 		expect(
 			screen.queryByRole("button", {
 				name: "Draw card",
 			}),
 		).not.toBeInTheDocument();
-		expect(screen.getByText("Card 52 of 52")).toBeInTheDocument();
-		expect(screen.getByText("Next snap chance: 0.0%")).toBeInTheDocument();
-		expect(screen.getByText("Value matches: 9")).toBeInTheDocument();
-		expect(screen.getByText("Suit matches: 4")).toBeInTheDocument();
+		expect(screen.queryByText("Card 52 of 52")).not.toBeInTheDocument();
+		expect(screen.queryByText("Next snap chance: 0.0%")).not.toBeInTheDocument();
+		expect(screen.getByText("Value matches: 9 | Suit matches: 4")).toBeInTheDocument();
 
 		fireEvent.click(
 			screen.getByRole("button", {
-				name: "Reset",
+				name: "Reset game",
 			}),
 		);
 

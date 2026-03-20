@@ -5,10 +5,9 @@ import { snapDeckConfig } from "../config/deck/DeckConfig";
 import { applyDrawResult } from "../service/snap/applyDrawResult";
 import { createInitialSnapState } from "../service/snap/createInitialSnapState";
 import { getNextSnapProbability } from "../service/snap/getNextSnapProbability";
-import { isDeckComplete } from "../service/snap/isDeckComplete";
 
 export namespace useSnapGame {
-	export type Phase = "idle" | "starting" | "ready" | "drawing" | "resetting";
+	export type Phase = "idle" | "starting" | "ready" | "drawing" | "resetting" | "completed";
 }
 
 export type SnapGamePhase = useSnapGame.Phase;
@@ -35,7 +34,7 @@ export const useSnapGame = () => {
 	);
 	const [phase, setPhase] = useState<useSnapGame.Phase>("idle");
 
-	/* biome-ignore lint/correctness/useExhaustiveDependencies: A new deck_id must reset local game state even when remaining returns to 52 again. */
+	/* biome-ignore lint/correctness/useExhaustiveDependencies: Only a new deck_id should reset local game state; deck remaining changes during play must not wipe progress. */
 	useEffect(() => {
 		setState(
 			createInitialSnapState({
@@ -46,8 +45,6 @@ export const useSnapGame = () => {
 		setPhase("idle");
 	}, [
 		deck.deck_id,
-		deck.remaining,
-		totalCards,
 	]);
 
 	const drawInternal = useCallback(async () => {
@@ -76,6 +73,8 @@ export const useSnapGame = () => {
 				}),
 			);
 		});
+
+		return Number(result.remaining) === 0;
 	}, [
 		deck.deck_id,
 		drawCardsMutation,
@@ -88,8 +87,8 @@ export const useSnapGame = () => {
 		setPhase("starting");
 
 		try {
-			await drawInternal();
-			setPhase("ready");
+			const isComplete = await drawInternal();
+			setPhase(isComplete ? "completed" : "ready");
 		} catch (error) {
 			setPhase("idle");
 			throw error;
@@ -105,8 +104,8 @@ export const useSnapGame = () => {
 		setPhase("drawing");
 
 		try {
-			await drawInternal();
-			setPhase("ready");
+			const isComplete = await drawInternal();
+			setPhase(isComplete ? "completed" : "ready");
 		} catch (error) {
 			setPhase("ready");
 			throw error;
@@ -182,9 +181,6 @@ export const useSnapGame = () => {
 			suitMatches: state.suitMatches,
 		},
 		nextSnapProbability: getNextSnapProbability({
-			state,
-		}),
-		isComplete: isDeckComplete({
 			state,
 		}),
 		start,

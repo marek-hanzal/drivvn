@@ -21,7 +21,6 @@ export const SnapGame: FC = () => {
 		drawnCount,
 		stats,
 		nextSnapProbability,
-		isComplete,
 		start,
 		draw,
 		reset,
@@ -51,6 +50,36 @@ export const SnapGame: FC = () => {
 						}}
 					>
 						Start
+					</Button>
+				}
+			/>
+		);
+	}
+
+	if (phase === "completed" || phase === "resetting") {
+		return (
+			<Status
+				icon={"icon-[ph--seal-warning-duotone]"}
+				textTitle={"Game over"}
+				textMessage={`Value matches: ${stats.valueMatches} | Suit matches: ${stats.suitMatches}`}
+				ui={{
+					theme: "light",
+					tone: "secondary",
+					round: "lg",
+					inner: "4xl",
+				}}
+				action={
+					<Button
+						disabled={phase === "resetting"}
+						onClick={reset}
+						ui={{
+							tone: "secondary",
+							theme: "light",
+							size: "lg",
+							text: "xl",
+						}}
+					>
+						Reset game
 					</Button>
 				}
 			/>
@@ -119,33 +148,18 @@ export const SnapGame: FC = () => {
 				/>
 			)}
 
-			{isComplete ? (
-				<Button
-					disabled={phase === "resetting"}
-					onClick={reset}
-					ui={{
-						tone: "secondary",
-						theme: "light",
-						size: "lg",
-						text: "xl",
-					}}
-				>
-					Reset
-				</Button>
-			) : (
-				<Button
-					disabled={phase === "drawing"}
-					onClick={draw}
-					ui={{
-						tone: "primary",
-						theme: "light",
-						size: "lg",
-						text: "xl",
-					}}
-				>
-					Draw card
-				</Button>
-			)}
+			<Button
+				disabled={phase === "drawing"}
+				onClick={draw}
+				ui={{
+					tone: "primary",
+					theme: "light",
+					size: "lg",
+					text: "xl",
+				}}
+			>
+				Draw card
+			</Button>
 		</Container>
 	);
 };
