@@ -1,14 +1,12 @@
 ## How to run
 - Copy `.env.example` -> `.env.local`
 - `bun install`
-- `docker compose up -d`
+- `docker compose up -d` (starts Postgres for the app)
 - `bun run dev` (we'll skip production runtime mess)
-- `bun run test` from repo root to run tests
+- `bun run test` from repo root to run tests (tests are using it's own Postgres, managed by test runner itself)
 
 Backend:
-http://localhost:3031/ (OpenAPI spec), you've to run migration endpoint (from the Scalar UI).
-
-The backend expects PostgreSQL to be running first. Without the `postgres` container, the app won't work.
+http://localhost:3031/ (OpenAPI spec), **you've to run migration endpoint (from the Scalar UI)**.
 
 ## Tests
 
