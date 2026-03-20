@@ -1,13 +1,14 @@
 import type { tCard } from "@drivvn/sdk/api/client";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { SnapGamePhase } from "../src/app/hook/useSnapGame";
 import { SnapGame } from "../src/app/ui/SnapGame";
 
 let start = vi.fn(async () => {});
 let draw = vi.fn(async () => {});
 let reset = vi.fn(async () => {});
 let hookState: {
-	hasStarted: boolean;
+	phase: SnapGamePhase;
 	currentCard?: tCard;
 	previousCard?: tCard;
 	message?: string;
@@ -18,8 +19,6 @@ let hookState: {
 	progressLabel: string;
 	nextSnapProbability: number;
 	isComplete: boolean;
-	isDrawing: boolean;
-	isResetting: boolean;
 };
 
 vi.mock("../src/app/hook/useSnapGame", () => ({
@@ -55,7 +54,7 @@ const createCard = ({
 describe("SnapGame", () => {
 	beforeEach(() => {
 		hookState = {
-			hasStarted: false,
+			phase: "idle",
 			currentCard: undefined,
 			previousCard: undefined,
 			message: undefined,
@@ -66,8 +65,6 @@ describe("SnapGame", () => {
 			progressLabel: "Card 0 of 52",
 			nextSnapProbability: 0,
 			isComplete: false,
-			isDrawing: false,
-			isResetting: false,
 		};
 		start = vi.fn(async () => {});
 		draw = vi.fn(async () => {});
@@ -104,7 +101,7 @@ describe("SnapGame", () => {
 	it("shows placeholders and live stats after the game starts", () => {
 		hookState = {
 			...hookState,
-			hasStarted: true,
+			phase: "ready",
 		};
 
 		render(<SnapGame />);
@@ -123,7 +120,7 @@ describe("SnapGame", () => {
 
 	it("renders cards, snap message and live stats from the control hook", async () => {
 		hookState = {
-			hasStarted: true,
+			phase: "ready",
 			currentCard: createCard({
 				code: "JD",
 				value: "JACK",
@@ -142,8 +139,6 @@ describe("SnapGame", () => {
 			progressLabel: "Card 12 of 52",
 			nextSnapProbability: 0.325,
 			isComplete: false,
-			isDrawing: false,
-			isResetting: false,
 		};
 
 		render(<SnapGame />);
@@ -166,7 +161,7 @@ describe("SnapGame", () => {
 	it("calls draw through the control hook", async () => {
 		hookState = {
 			...hookState,
-			hasStarted: true,
+			phase: "ready",
 		};
 
 		render(<SnapGame />);
@@ -184,7 +179,7 @@ describe("SnapGame", () => {
 
 	it("shows reset instead of draw when the game is complete and calls reset", async () => {
 		hookState = {
-			hasStarted: true,
+			phase: "ready",
 			currentCard: createCard({
 				code: "AS",
 				value: "ACE",
@@ -203,8 +198,6 @@ describe("SnapGame", () => {
 			progressLabel: "Card 52 of 52",
 			nextSnapProbability: 0,
 			isComplete: true,
-			isDrawing: false,
-			isResetting: false,
 		};
 
 		render(<SnapGame />);

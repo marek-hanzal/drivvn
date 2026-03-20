@@ -13,7 +13,7 @@ const toCardAlt = (value: string, suit: string) => {
 
 export const SnapGame: FC = () => {
 	const {
-		hasStarted,
+		phase,
 		currentCard,
 		previousCard,
 		message,
@@ -21,14 +21,12 @@ export const SnapGame: FC = () => {
 		progressLabel,
 		nextSnapProbability,
 		isComplete,
-		isDrawing,
-		isResetting,
 		start,
 		draw,
 		reset,
 	} = useSnapGame();
 
-	if (!hasStarted) {
+	if (phase === "idle" || phase === "starting") {
 		return (
 			<Status
 				icon={"icon-[ph--cards-three-duotone]"}
@@ -42,7 +40,7 @@ export const SnapGame: FC = () => {
 				}}
 				action={
 					<Button
-						disabled={isDrawing}
+						disabled={phase === "starting"}
 						onClick={start}
 						ui={{
 							tone: "primary",
@@ -122,7 +120,7 @@ export const SnapGame: FC = () => {
 
 			{isComplete ? (
 				<Button
-					disabled={isResetting}
+					disabled={phase === "resetting"}
 					onClick={reset}
 					ui={{
 						tone: "secondary",
@@ -135,7 +133,7 @@ export const SnapGame: FC = () => {
 				</Button>
 			) : (
 				<Button
-					disabled={isDrawing}
+					disabled={phase === "drawing"}
 					onClick={draw}
 					ui={{
 						tone: "primary",

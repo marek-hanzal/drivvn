@@ -7,6 +7,10 @@ import { getCardProgressLabel } from "../service/snap/getCardProgressLabel";
 import { getNextSnapProbability } from "../service/snap/getNextSnapProbability";
 import { isDeckComplete } from "../service/snap/isDeckComplete";
 
+export namespace useSnapGame {
+	export type Phase = "idle" | "starting" | "ready" | "drawing" | "resetting";
+}
+
 export const useSnapGame = () => {
 	const deckQuery = withGetShuffledDeckQuery.useSuspenseQuery({
 		query: {
@@ -21,14 +25,12 @@ export const useSnapGame = () => {
 	const drawCardsMutation = withDrawCardsExistingDeckMutation.useMutation();
 	const deck = deckQuery.data;
 	const [state, setState] = useState(() => createInitialSnapState(deck.remaining));
-	const [hasStarted, setHasStarted] = useState(false);
-	const [isDrawing, setIsDrawing] = useState(false);
-	const [isResetting, setIsResetting] = useState(false);
+	const [phase, setPhase] = useState<useSnapGame.Phase>("idle");
 
 	/* biome-ignore lint/correctness/useExhaustiveDependencies: A new deck_id must reset local game state even when remaining returns to 52 again. */
 	useEffect(() => {
 		setState(createInitialSnapState(deck.remaining));
-		setHasStarted(false);
+		setPhase("idle");
 	}, [
 		deck.deck_id,
 		deck.remaining,
@@ -63,13 +65,14 @@ export const useSnapGame = () => {
 	 * Start the game and immediately draw the first card from the shuffled deck.
 	 */
 	const start = async () => {
-		setIsDrawing(true);
+		setPhase("starting");
 
 		try {
 			await drawInternal();
-			setHasStarted(true);
-		} finally {
-			setIsDrawing(false);
+			setPhase("ready");
+		} catch (error) {
+			setPhase("idle");
+			throw error;
 		}
 	};
 
@@ -77,12 +80,14 @@ export const useSnapGame = () => {
 	 * Draw the next card from the current shuffled deck.
 	 */
 	const draw = async () => {
-		setIsDrawing(true);
+		setPhase("drawing");
 
 		try {
 			await drawInternal();
-		} finally {
-			setIsDrawing(false);
+			setPhase("ready");
+		} catch (error) {
+			setPhase("ready");
+			throw error;
 		}
 	};
 
@@ -90,7 +95,7 @@ export const useSnapGame = () => {
 	 * Reset the game by invalidating the shuffled deck query and immediately starting a fresh run.
 	 */
 	const reset = async () => {
-		setIsResetting(true);
+		setPhase("resetting");
 
 		try {
 			await invalidateDeck();
@@ -124,14 +129,15 @@ export const useSnapGame = () => {
 					}),
 				);
 			});
-			setHasStarted(true);
-		} finally {
-			setIsResetting(false);
+			setPhase("ready");
+		} catch (error) {
+			setPhase("ready");
+			throw error;
 		}
 	};
 
 	return {
-		hasStarted,
+		phase,
 		currentCard: state.currentCard,
 		previousCard: state.previousCard,
 		message: state.message,
@@ -142,8 +148,6 @@ export const useSnapGame = () => {
 		progressLabel: getCardProgressLabel(state),
 		nextSnapProbability: getNextSnapProbability(state),
 		isComplete: isDeckComplete(state),
-		isDrawing,
-		isResetting,
 		start,
 		draw,
 		reset,
