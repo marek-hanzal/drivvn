@@ -1,10 +1,17 @@
 import type { tCard } from "@drivvn/sdk/api/client";
 import type { SnapMessage } from "./types";
 
-export const resolveSnapMessage = (
-	previousCard: tCard | undefined,
-	currentCard: tCard,
-): SnapMessage | undefined => {
+export namespace resolveSnapMessage {
+	export interface Props {
+		previousCard: tCard | undefined;
+		currentCard: tCard;
+	}
+}
+
+export const resolveSnapMessage = ({
+	previousCard,
+	currentCard,
+}: resolveSnapMessage.Props): SnapMessage | undefined => {
 	if (!previousCard) {
 		return undefined;
 	}

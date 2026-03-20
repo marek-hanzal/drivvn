@@ -28,56 +28,94 @@ const createCard = ({
 
 describe("snap service", () => {
 	it("tracks card progress labels", () => {
-		const state = applyDrawResult(createInitialSnapState(52), {
-			card: createCard({
-				code: "AH",
-				value: "ACE",
-				suit: "HEARTS",
+		const state = applyDrawResult({
+			state: createInitialSnapState({
+				remaining: 52,
 			}),
-			remaining: 51,
+			drawResult: {
+				card: createCard({
+					code: "AH",
+					value: "ACE",
+					suit: "HEARTS",
+				}),
+				remaining: 51,
+			},
 		});
 
-		expect(getCardProgressLabel(state)).toBe("Card 1 of 52");
+		expect(
+			getCardProgressLabel({
+				state,
+			}),
+		).toBe("Card 1 of 52");
 	});
 
 	it("calculates the probability of the next value or suit match from drawn cards", () => {
-		const firstDraw = applyDrawResult(createInitialSnapState(52), {
-			card: createCard({
-				code: "AH",
-				value: "ACE",
-				suit: "HEARTS",
+		const firstDraw = applyDrawResult({
+			state: createInitialSnapState({
+				remaining: 52,
 			}),
-			remaining: 51,
+			drawResult: {
+				card: createCard({
+					code: "AH",
+					value: "ACE",
+					suit: "HEARTS",
+				}),
+				remaining: 51,
+			},
 		});
 
-		expect(getNextSnapProbability(firstDraw)).toBeCloseTo(15 / 51);
-
-		const secondDraw = applyDrawResult(firstDraw, {
-			card: createCard({
-				code: "AC",
-				value: "ACE",
-				suit: "CLUBS",
+		expect(
+			getNextSnapProbability({
+				state: firstDraw,
 			}),
-			remaining: 50,
+		).toBeCloseTo(15 / 51);
+
+		const secondDraw = applyDrawResult({
+			state: firstDraw,
+			drawResult: {
+				card: createCard({
+					code: "AC",
+					value: "ACE",
+					suit: "CLUBS",
+				}),
+				remaining: 50,
+			},
 		});
 
-		expect(getNextSnapProbability(secondDraw)).toBeCloseTo(14 / 50);
+		expect(
+			getNextSnapProbability({
+				state: secondDraw,
+			}),
+		).toBeCloseTo(14 / 50);
 	});
 
 	it("returns zero probability when there is no current card or no cards left", () => {
-		const initialState = createInitialSnapState(52);
-
-		expect(getNextSnapProbability(initialState)).toBe(0);
-
-		const finishedState = applyDrawResult(initialState, {
-			card: createCard({
-				code: "KS",
-				value: "KING",
-				suit: "SPADES",
-			}),
-			remaining: 0,
+		const initialState = createInitialSnapState({
+			remaining: 52,
 		});
 
-		expect(getNextSnapProbability(finishedState)).toBe(0);
+		expect(
+			getNextSnapProbability({
+				state: initialState,
+			}),
+		).toBe(0);
+
+		const finishedState = applyDrawResult({
+			state: initialState,
+			drawResult: {
+				card: createCard({
+					code: "KS",
+					value: "KING",
+					suit: "SPADES",
+				}),
+				remaining: 0,
+			},
+		});
+
+		expect(
+			getNextSnapProbability({
+				state: finishedState,
+			}),
+		).toBe(0);
 	});
 });

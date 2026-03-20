@@ -1,10 +1,10 @@
-import type { tCard, tRemaining } from "@drivvn/sdk/api/client";
+import type { tCard } from "@drivvn/sdk/api/client";
 
 export type SnapMessage = "SNAP VALUE!" | "SNAP SUIT!";
 
 export interface DrawResult {
 	card: tCard;
-	remaining: tRemaining;
+	remaining: number;
 }
 
 export type CountMap = Record<string, number>;

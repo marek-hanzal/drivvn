@@ -1,8 +1,12 @@
-import type { tRemaining } from "@drivvn/sdk/api/client";
-import { normalizeRemaining } from "./normalizeRemaining";
 import type { SnapState } from "./types";
 
-export const createInitialSnapState = (remaining: tRemaining): SnapState => {
+export namespace createInitialSnapState {
+	export interface Props {
+		remaining: number;
+	}
+}
+
+export const createInitialSnapState = ({ remaining }: createInitialSnapState.Props): SnapState => {
 	return {
 		currentCard: undefined,
 		previousCard: undefined,
@@ -12,6 +16,6 @@ export const createInitialSnapState = (remaining: tRemaining): SnapState => {
 		drawnCount: 0,
 		drawnValues: {},
 		drawnSuits: {},
-		remaining: normalizeRemaining(remaining),
+		remaining,
 	};
 };

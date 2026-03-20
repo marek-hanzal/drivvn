@@ -1,6 +1,12 @@
 import type { SnapState } from "./types";
 
-export const getNextSnapProbability = (state: SnapState): number => {
+export namespace getNextSnapProbability {
+	export interface Props {
+		state: SnapState;
+	}
+}
+
+export const getNextSnapProbability = ({ state }: getNextSnapProbability.Props): number => {
 	if (!state.currentCard || state.remaining <= 0) {
 		return 0;
 	}

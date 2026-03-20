@@ -1,5 +1,11 @@
 import type { SnapState } from "./types";
 
-export const getCardProgressLabel = (state: SnapState): string => {
+export namespace getCardProgressLabel {
+	export interface Props {
+		state: SnapState;
+	}
+}
+
+export const getCardProgressLabel = ({ state }: getCardProgressLabel.Props): string => {
 	return `Card ${state.drawnCount} of 52`;
 };

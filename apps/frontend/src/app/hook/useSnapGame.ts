@@ -26,12 +26,20 @@ export const useSnapGame = () => {
 	});
 	const drawCardsMutation = withDrawCardsExistingDeckMutation.useMutation();
 	const deck = deckQuery.data;
-	const [state, setState] = useState(() => createInitialSnapState(deck.remaining));
+	const [state, setState] = useState(() =>
+		createInitialSnapState({
+			remaining: Number(deck.remaining),
+		}),
+	);
 	const [phase, setPhase] = useState<useSnapGame.Phase>("idle");
 
 	/* biome-ignore lint/correctness/useExhaustiveDependencies: A new deck_id must reset local game state even when remaining returns to 52 again. */
 	useEffect(() => {
-		setState(createInitialSnapState(deck.remaining));
+		setState(
+			createInitialSnapState({
+				remaining: Number(deck.remaining),
+			}),
+		);
 		setPhase("idle");
 	}, [
 		deck.deck_id,
@@ -55,9 +63,12 @@ export const useSnapGame = () => {
 
 		startTransition(() => {
 			setState((current) =>
-				applyDrawResult(current, {
-					card,
-					remaining: result.remaining,
+				applyDrawResult({
+					state: current,
+					drawResult: {
+						card,
+						remaining: Number(result.remaining),
+					},
 				}),
 			);
 		});
@@ -115,7 +126,9 @@ export const useSnapGame = () => {
 				throw new Error("Shuffled deck query returned no deck.");
 			}
 
-			const nextState = createInitialSnapState(nextDeckData.remaining);
+			const nextState = createInitialSnapState({
+				remaining: Number(nextDeckData.remaining),
+			});
 			const result = await drawCardsMutation.mutateAsync({
 				path: {
 					deck_id: nextDeckData.deck_id,
@@ -132,9 +145,12 @@ export const useSnapGame = () => {
 
 			startTransition(() => {
 				setState(
-					applyDrawResult(nextState, {
-						card,
-						remaining: result.remaining,
+					applyDrawResult({
+						state: nextState,
+						drawResult: {
+							card,
+							remaining: Number(result.remaining),
+						},
 					}),
 				);
 			});
@@ -158,9 +174,15 @@ export const useSnapGame = () => {
 			valueMatches: state.valueMatches,
 			suitMatches: state.suitMatches,
 		},
-		progressLabel: getCardProgressLabel(state),
-		nextSnapProbability: getNextSnapProbability(state),
-		isComplete: isDeckComplete(state),
+		progressLabel: getCardProgressLabel({
+			state,
+		}),
+		nextSnapProbability: getNextSnapProbability({
+			state,
+		}),
+		isComplete: isDeckComplete({
+			state,
+		}),
 		start,
 		draw,
 		reset,
