@@ -1,4 +1,5 @@
 import { Container } from "@use-pico/client/ui/container";
+import { AnimatePresence, motion } from "motion/react";
 import type { CSSProperties, FC } from "react";
 import { HeroImage } from "./HeroImage";
 import { SnapCardSlot } from "./SnapCardSlot";
@@ -20,12 +21,27 @@ const STACK_LAYERS = [
 export namespace CurrentDeckStack {
 	export interface Props {
 		alt: string;
+		cardKey?: string;
+		isAnimating?: boolean;
 		src?: string;
 		remainingCount: number;
 	}
 }
 
-export const CurrentDeckStack: FC<CurrentDeckStack.Props> = ({ alt, src, remainingCount }) => {
+const cardTransition = {
+	type: "spring",
+	stiffness: 360,
+	damping: 30,
+	mass: 0.9,
+} as const;
+
+export const CurrentDeckStack: FC<CurrentDeckStack.Props> = ({
+	alt,
+	cardKey,
+	isAnimating = false,
+	src,
+	remainingCount,
+}) => {
 	const visibleCount = Math.min(remainingCount, MAX_VISIBLE_CARDS);
 	const stackStartRem = SNAP_STACK_OFFSET_REM - visibleCount * STACK_STEP_REM;
 
@@ -40,48 +56,89 @@ export const CurrentDeckStack: FC<CurrentDeckStack.Props> = ({ alt, src, remaini
 				height: `${SNAP_CARD_HEIGHT_REM + SNAP_STACK_OFFSET_REM}rem`,
 			}}
 		>
-			{STACK_LAYERS.slice(0, visibleCount).map((layer) => {
-				const style: CSSProperties = {
-					position: "absolute",
-					left: 0,
-					top: `${stackStartRem + layer * STACK_STEP_REM}rem`,
-					width: `${SNAP_CARD_WIDTH_REM}rem`,
-					height: `${SNAP_CARD_HEIGHT_REM}rem`,
-					zIndex: layer + 1,
-				};
+			<AnimatePresence initial={false}>
+				{STACK_LAYERS.slice(0, visibleCount).map((layer) => {
+					const style: CSSProperties = {
+						position: "absolute",
+						left: 0,
+						top: `${stackStartRem + layer * STACK_STEP_REM}rem`,
+						width: `${SNAP_CARD_WIDTH_REM}rem`,
+						height: `${SNAP_CARD_HEIGHT_REM}rem`,
+						zIndex: layer + 1,
+					};
 
-				return (
-					<Container
-						key={`deck-back-${layer}`}
-						className={"rounded-[0.75rem] shadow-sm"}
-						style={style}
-					>
-						<HeroImage
-							alt={"Deck back"}
-							src={CARD_BACK_SRC}
-							ui={{
-								width: "full",
-								height: "full",
+					return (
+						<motion.div
+							key={`deck-back-${layer}`}
+							animate={{
+								scale: isAnimating ? 0.985 : 1,
+								y: isAnimating ? -10 : 0,
 							}}
-						/>
-					</Container>
-				);
-			})}
+							className={"rounded-[0.75rem] shadow-sm"}
+							exit={{
+								opacity: 0,
+								scale: 0.96,
+								y: -16,
+							}}
+							initial={{
+								opacity: 0,
+								scale: 0.94,
+								y: 20,
+							}}
+							layout
+							style={style}
+							transition={cardTransition}
+						>
+							<HeroImage
+								alt={"Deck back"}
+								src={CARD_BACK_SRC}
+								ui={{
+									width: "full",
+									height: "full",
+								}}
+							/>
+						</motion.div>
+					);
+				})}
+			</AnimatePresence>
 
-			<Container
-				style={{
-					position: "absolute",
-					left: 0,
-					top: `${SNAP_STACK_OFFSET_REM}rem`,
-					width: `${SNAP_CARD_WIDTH_REM}rem`,
-					zIndex: MAX_VISIBLE_CARDS + 1,
-				}}
-			>
-				<SnapCardSlot
-					alt={alt}
-					src={src}
-				/>
-			</Container>
+			<AnimatePresence initial={false}>
+				<motion.div
+					key={cardKey ?? src ?? "card-placeholder"}
+					animate={{
+						opacity: 1,
+						scale: 1,
+						x: 0,
+						y: 0,
+					}}
+					exit={{
+						opacity: 0,
+						scale: 0.96,
+						x: -36,
+					}}
+					initial={{
+						opacity: 0,
+						scale: 0.96,
+						x: 36,
+						y: 0,
+					}}
+					layout
+					layoutId={cardKey ? `snap-card-${cardKey}` : undefined}
+					style={{
+						position: "absolute",
+						left: 0,
+						top: `${SNAP_STACK_OFFSET_REM}rem`,
+						width: `${SNAP_CARD_WIDTH_REM}rem`,
+						zIndex: MAX_VISIBLE_CARDS + 1,
+					}}
+					transition={cardTransition}
+				>
+					<SnapCardSlot
+						alt={alt}
+						src={src}
+					/>
+				</motion.div>
+			</AnimatePresence>
 		</Container>
 	);
 };

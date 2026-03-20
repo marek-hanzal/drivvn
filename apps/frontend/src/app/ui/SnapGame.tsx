@@ -1,16 +1,19 @@
 import { Button } from "@use-pico/client/ui/button";
 import { Container } from "@use-pico/client/ui/container";
 import { Status } from "@use-pico/client/ui/status";
+import { AnimatePresence, LayoutGroup, motion } from "motion/react";
 import type { FC } from "react";
 import { useSnapGame } from "../hook/useSnapGame";
-import {
-	CurrentDeckStack,
-	SNAP_CARD_HEIGHT_REM,
-	SNAP_STACK_OFFSET_REM,
-} from "./CurrentDeckStack";
+import { CurrentDeckStack, SNAP_CARD_HEIGHT_REM, SNAP_STACK_OFFSET_REM } from "./CurrentDeckStack";
 import { SnapCardSlot } from "./SnapCardSlot";
 
 const PLACEHOLDER_ALT = "Card placeholder";
+const cardTransition = {
+	type: "spring",
+	stiffness: 360,
+	damping: 30,
+	mass: 0.9,
+} as const;
 
 const toCardAlt = (value: string, suit: string) => {
 	return `${value.toLowerCase()} of ${suit.toLowerCase()}`;
@@ -138,44 +141,99 @@ export const SnapGame: FC = () => {
 					minHeight: `${SNAP_CARD_HEIGHT_REM + SNAP_STACK_OFFSET_REM}rem`,
 				}}
 			>
-				<Container
-					className={[
-						"relative",
-						"w-40",
-						"shrink-0",
-					]}
-					style={{
-						height: `${SNAP_CARD_HEIGHT_REM + SNAP_STACK_OFFSET_REM}rem`,
-					}}
-				>
+				<LayoutGroup id={"snap-board"}>
 					<Container
+						className={[
+							"relative",
+							"w-40",
+							"shrink-0",
+						]}
 						style={{
-							position: "absolute",
-							left: 0,
-							top: `${SNAP_STACK_OFFSET_REM}rem`,
-							width: "10rem",
+							height: `${SNAP_CARD_HEIGHT_REM + SNAP_STACK_OFFSET_REM}rem`,
 						}}
 					>
-						<SnapCardSlot
-							alt={
-								previousCard
-									? toCardAlt(previousCard.value, previousCard.suit)
-									: PLACEHOLDER_ALT
-							}
-							src={previousCard?.image}
-						/>
+						<AnimatePresence initial={false}>
+							{previousCard ? (
+								<motion.div
+									key={previousCard.code}
+									animate={{
+										opacity: 1,
+										scale: 1,
+										x: 0,
+										y: 0,
+									}}
+									exit={{
+										opacity: 0,
+										scale: 0.96,
+										x: -36,
+									}}
+									initial={{
+										opacity: 0,
+										scale: 0.96,
+										x: -24,
+										y: 0,
+									}}
+									layout
+									layoutId={`snap-card-${previousCard.code}`}
+									style={{
+										position: "absolute",
+										left: 0,
+										top: `${SNAP_STACK_OFFSET_REM}rem`,
+										width: "10rem",
+									}}
+									transition={cardTransition}
+								>
+									<SnapCardSlot
+										alt={toCardAlt(previousCard.value, previousCard.suit)}
+										src={previousCard.image}
+									/>
+								</motion.div>
+							) : (
+								<motion.div
+									key={"previous-placeholder"}
+									animate={{
+										opacity: 1,
+										scale: 1,
+										y: 0,
+									}}
+									exit={{
+										opacity: 0,
+										scale: 0.98,
+									}}
+									initial={{
+										opacity: 0,
+										scale: 0.98,
+										y: 0,
+									}}
+									style={{
+										position: "absolute",
+										left: 0,
+										top: `${SNAP_STACK_OFFSET_REM}rem`,
+										width: "10rem",
+									}}
+									transition={cardTransition}
+								>
+									<SnapCardSlot
+										alt={PLACEHOLDER_ALT}
+										src={undefined}
+									/>
+								</motion.div>
+							)}
+						</AnimatePresence>
 					</Container>
-				</Container>
 
-				<CurrentDeckStack
-					alt={
-						currentCard
-							? toCardAlt(currentCard.value, currentCard.suit)
-							: PLACEHOLDER_ALT
-					}
-					src={currentCard?.image}
-					remainingCount={remainingCount}
-				/>
+					<CurrentDeckStack
+						alt={
+							currentCard
+								? toCardAlt(currentCard.value, currentCard.suit)
+								: PLACEHOLDER_ALT
+						}
+						cardKey={currentCard?.code}
+						isAnimating={phase === "drawing"}
+						src={currentCard?.image}
+						remainingCount={remainingCount}
+					/>
+				</LayoutGroup>
 
 				<Container
 					ui={{
@@ -194,14 +252,40 @@ export const SnapGame: FC = () => {
 				</Container>
 			</Container>
 
-			{message ? (
-				<div className={"text-lg font-semibold tracking-[0.15em]"}>{message}</div>
-			) : (
-				<div
-					aria-hidden={"true"}
-					className={"h-7"}
-				/>
-			)}
+			<AnimatePresence mode={"wait"}>
+				{message ? (
+					<motion.div
+						key={message}
+						animate={{
+							opacity: 1,
+							scale: 1,
+							y: 0,
+						}}
+						className={"text-lg font-semibold tracking-[0.15em]"}
+						exit={{
+							opacity: 0,
+							scale: 0.96,
+							y: -10,
+						}}
+						initial={{
+							opacity: 0,
+							scale: 0.96,
+							y: 10,
+						}}
+						transition={{
+							duration: 0.18,
+							ease: "easeOut",
+						}}
+					>
+						{message}
+					</motion.div>
+				) : (
+					<div
+						aria-hidden={"true"}
+						className={"h-7"}
+					/>
+				)}
+			</AnimatePresence>
 
 			<Button
 				disabled={phase === "drawing"}
