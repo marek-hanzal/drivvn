@@ -49,8 +49,8 @@ const createCelebrationCards = (
 		const rotateStart = -8 + spinBias * 16;
 		const rotateMid = rotateStart + (-30 + pseudo(index + 61) * 60);
 		const rotateEnd = rotateMid + (-24 + pseudo(index + 71) * 48);
-		const fadeStart = 0.52 + pseudo(index + 81) * 0.28;
-		const fadeEnd = Math.min(0.98, fadeStart + 0.1 + pseudo(index + 91) * 0.16);
+		const fadeStart = 0.18 + pseudo(index + 81) * 0.12;
+		const fadeEnd = Math.min(0.56, fadeStart + 0.1 + pseudo(index + 91) * 0.08);
 
 		return {
 			delay: order * 0.032 + wave * 0.12,
@@ -114,7 +114,8 @@ export const WinCelebration: FC<WinCelebration.Props> = ({ onSkip, suitMatches, 
 							opacity: [
 								0,
 								1,
-								1,
+								0.55,
+								0.14,
 								0,
 							],
 							rotate: [

@@ -1,3 +1,13 @@
+# Animation
+
+> **Pseudo Win95 Solitaire animation** - you wanted animations? Codex has some in it's silicon sleeves.
+
+I went out of the rails just because that card thing was quite a fun for me, but I must admit all the animations are done by Codex while
+I was pushing it to the goal I had in my head.
+
+I've some knowledge about react motion, but the math and the complexity behind it here is far in my past when I was writing 3D engine using
+C and SDL (OpenGL).
+
 # Credits
 
 > If this file is not here, I would just lie straight to your face - frontend is done highly with me + Codex coop.
